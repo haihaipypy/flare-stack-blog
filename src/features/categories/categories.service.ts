@@ -140,11 +140,48 @@ export const createCategory = async (
   }
 
   // Use raw D1 API to avoid Drizzle inserting NULL for auto-increment id column.
-  // Also explicitly set created_at in case the table was created without the DEFAULT.
+  // The categories table was created manually and may have extra NOT NULL columns
+  // (e.g. slug) that Drizzle's schema doesn't know about. We introspect the table
+  // schema and supply values for every NOT NULL column we recognize.
   const now = Math.floor(Date.now() / 1000);
-  const stmt = context.env.DB.prepare(
-    "INSERT INTO categories (name, created_at) VALUES (?1, ?2)",
-  ).bind(data.name, now);
+  const slug = data.name
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, "-")
+    .replace(/^-+|-+$/g, "") || `cat-${now}`;
+
+  const tableInfo = await context.env.DB.prepare(
+    "PRAGMA table_info(categories)",
+  ).all<{ name: string; notnull: number; pk: number }>();
+
+  const columnValues: Record<string, string | number> = {
+    name: data.name,
+    slug,
+    created_at: now,
+  };
+
+  // Build INSERT based on actual columns present in the table
+  const presentColumns: Array<string> = [];
+  const placeholders: Array<string> = [];
+  const values: Array<string | number> = [];
+  let paramIndex = 1;
+  for (const col of tableInfo.results ?? []) {
+    if (col.pk === 1) continue; // Skip primary key (id)
+    if (col.name in columnValues) {
+      presentColumns.push(col.name);
+      placeholders.push(`?${paramIndex}`);
+      values.push(columnValues[col.name]!);
+      paramIndex++;
+    } else if (col.notnull === 1) {
+      // Unknown NOT NULL column we don't have a value for - abort early
+      throw new Error(
+        `Cannot create category: column '${col.name}' is NOT NULL but no value provided`,
+      );
+    }
+  }
+
+  const insertSql = `INSERT INTO categories (${presentColumns.map((c) => `"${c}"`).join(", ")}) VALUES (${placeholders.join(", ")})`;
+  const stmt = context.env.DB.prepare(insertSql).bind(...values);
   const result = await stmt.run();
 
   if (!result.success) {
@@ -156,7 +193,6 @@ export const createCategory = async (
 
   const insertId = result.meta.last_row_id;
   if (!insertId || insertId === 0) {
-    // Fallback: try to find by name
     const category = await CategoryRepo.findCategoryByName(
       context.db,
       data.name,
@@ -172,7 +208,6 @@ export const createCategory = async (
   const category = await CategoryRepo.findCategoryById(context.db, insertId);
 
   if (!category) {
-    // Fallback: try to find by name
     const byName = await CategoryRepo.findCategoryByName(
       context.db,
       data.name,
