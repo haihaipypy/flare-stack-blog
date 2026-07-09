@@ -26,9 +26,7 @@ const config = defineConfig(({ mode }) => {
       __THEME_CONFIG__: JSON.stringify(themes[buildEnv.THEME]),
     },
     optimizeDeps: {
-      esbuildOptions: {
-        external: ["cloudflare:sockets", "cloudflare:workers"],
-      },
+      exclude: ["cloudflare:sockets", "cloudflare:workers"],
     },
     resolve: {
       alias: {
