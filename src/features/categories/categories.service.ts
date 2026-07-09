@@ -158,6 +158,7 @@ export const createCategory = async (
     name: data.name,
     slug,
     created_at: now,
+    sort_order: 0,
   };
 
   // Build INSERT based on actual columns present in the table
