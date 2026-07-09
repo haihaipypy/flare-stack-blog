@@ -1,4 +1,5 @@
 import type { z } from "zod";
+import { CATEGORIES_CACHE_KEYS } from "@/features/categories/categories.schema";
 import { TAGS_CACHE_KEYS } from "@/features/tags/tags.schema";
 import type { Duration } from "@/lib/duration";
 import { ms } from "@/lib/duration";
@@ -197,6 +198,7 @@ export async function invalidateSiteCache(
     bumpVersion(context, "posts:list"),
     bumpVersion(context, "posts:detail"),
     deleteKey(context, TAGS_CACHE_KEYS.publicList),
+    deleteKey(context, CATEGORIES_CACHE_KEYS.publicList),
   ];
 
   await Promise.all([purgeTask, ...kvTasks]);

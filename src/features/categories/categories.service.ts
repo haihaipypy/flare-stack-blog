@@ -209,7 +209,7 @@ export async function deleteCategory(
 }
 
 export async function setPostCategories(
-  context: DbContext,
+  context: DbContext & { executionCtx: ExecutionContext },
   data: SetPostCategoriesInput,
 ) {
   await CategoryRepo.setPostCategories(
@@ -218,6 +218,15 @@ export async function setPostCategories(
     data.categoryIds,
   );
   await PostRepo.touchPostUpdatedAt(context.db, data.postId);
+
+  context.executionCtx.waitUntil(
+    Promise.all([
+      CacheService.deleteKey(context, CATEGORIES_CACHE_KEYS.publicList),
+      CacheService.bumpVersion(context, "posts:list"),
+      purgeCDNCache(context.env, { urls: ["/", "/posts"] }),
+    ]),
+  );
+
   await PostAutoSnapshotService.enqueuePostAutoSnapshot(context, {
     postId: data.postId,
     source: "category_update",

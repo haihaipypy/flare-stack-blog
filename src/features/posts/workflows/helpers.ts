@@ -1,4 +1,5 @@
 import * as CacheService from "@/features/cache/cache.service";
+import { CATEGORIES_CACHE_KEYS } from "@/features/categories/categories.schema";
 import { POSTS_CACHE_KEYS } from "@/features/posts/schema/posts.schema";
 import * as PostService from "@/features/posts/services/posts.service";
 import * as SearchService from "@/features/search/service/search.service";
@@ -18,6 +19,7 @@ export async function invalidatePostCaches(env: Env, slug: string) {
     purgePostCDNCache(env, slug),
     CacheService.bumpVersion({ env }, "posts:list"),
     CacheService.deleteKey({ env }, TAGS_CACHE_KEYS.publicList),
+    CacheService.deleteKey({ env }, CATEGORIES_CACHE_KEYS.publicList),
   ]);
 }
 
