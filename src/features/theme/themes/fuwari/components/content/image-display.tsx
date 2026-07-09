@@ -27,14 +27,6 @@ export function ImageDisplay({
         />
       </div>
 
-      {/* Caption Content */}
-      {alt && (
-        <figcaption className="mt-4 p-0 flex items-center justify-center gap-2 px-4 text-center">
-          <span className="text-sm font-medium fuwari-text-50 transition-colors duration-500 group-hover:fuwari-text-75 select-none">
-            {alt}
-          </span>
-        </figcaption>
-      )}
     </figure>
   );
 }
