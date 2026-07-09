@@ -134,16 +134,24 @@ export const createCategory = async (
   context: DbContext,
   data: CreateCategoryInput,
 ) => {
-  const exists = await CategoryRepo.nameExists(context.db, data.name);
-  if (exists) {
-    return err({ reason: "CATEGORY_NAME_ALREADY_EXISTS" });
+  console.log("[createCategory] start, name:", data.name);
+  try {
+    const exists = await CategoryRepo.nameExists(context.db, data.name);
+    console.log("[createCategory] nameExists:", exists);
+    if (exists) {
+      return err({ reason: "CATEGORY_NAME_ALREADY_EXISTS" });
+    }
+
+    const category = await CategoryRepo.insertCategory(context.db, {
+      name: data.name,
+    });
+    console.log("[createCategory] inserted:", category);
+
+    return ok(category);
+  } catch (error) {
+    console.error("[createCategory] error:", error);
+    throw error;
   }
-
-  const category = await CategoryRepo.insertCategory(context.db, {
-    name: data.name,
-  });
-
-  return ok(category);
 };
 
 export async function updateCategory(
