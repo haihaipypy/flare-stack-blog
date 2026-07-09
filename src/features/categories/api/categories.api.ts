@@ -32,7 +32,14 @@ export const createCategoryFn = createServerFn({
 })
   .middleware([adminMiddleware])
   .inputValidator(CreateCategoryInputSchema)
-  .handler(({ data, context }) => CategoryService.createCategory(context, data));
+  .handler(async ({ data, context }) => {
+    try {
+      return await CategoryService.createCategory(context, data);
+    } catch (error) {
+      console.error("[createCategoryFn] error:", error);
+      throw error;
+    }
+  });
 
 export const updateCategoryFn = createServerFn({
   method: "POST",

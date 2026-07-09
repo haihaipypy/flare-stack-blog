@@ -139,27 +139,48 @@ export const createCategory = async (
     return err({ reason: "CATEGORY_NAME_ALREADY_EXISTS" });
   }
 
-  // Use raw D1 API to avoid Drizzle inserting NULL for auto-increment id column,
-  // which fails on D1 in certain table creation scenarios.
+  // Use raw D1 API to avoid Drizzle inserting NULL for auto-increment id column.
+  // Also explicitly set created_at in case the table was created without the DEFAULT.
+  const now = Math.floor(Date.now() / 1000);
   const stmt = context.env.DB.prepare(
-    "INSERT INTO categories (name) VALUES (?1)",
-  ).bind(data.name);
+    "INSERT INTO categories (name, created_at) VALUES (?1, ?2)",
+  ).bind(data.name, now);
   const result = await stmt.run();
 
   if (!result.success) {
-    console.error("[createCategory] D1 insert failed:", result);
-    throw new Error("Failed to create category");
+    console.error("[createCategory] D1 insert failed, meta:", JSON.stringify(result.meta));
+    throw new Error(
+      `D1 insert failed (success=false, meta=${JSON.stringify(result.meta)})`,
+    );
   }
 
   const insertId = result.meta.last_row_id;
+  if (!insertId || insertId === 0) {
+    // Fallback: try to find by name
+    const category = await CategoryRepo.findCategoryByName(
+      context.db,
+      data.name,
+    );
+    if (!category) {
+      throw new Error(
+        `Insert succeeded but could not retrieve category (last_row_id=${insertId})`,
+      );
+    }
+    return ok(category);
+  }
+
   const category = await CategoryRepo.findCategoryById(context.db, insertId);
 
   if (!category) {
-    console.error(
-      "[createCategory] Category not found after insert, id:",
-      insertId,
+    // Fallback: try to find by name
+    const byName = await CategoryRepo.findCategoryByName(
+      context.db,
+      data.name,
     );
-    throw new Error("Category created but could not be retrieved");
+    if (byName) return ok(byName);
+    throw new Error(
+      `Category created (id=${insertId}) but could not be retrieved`,
+    );
   }
 
   return ok(category);

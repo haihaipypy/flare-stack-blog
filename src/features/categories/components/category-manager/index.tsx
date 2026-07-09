@@ -109,8 +109,11 @@ export function CategoryManager() {
       setIsCreating(false);
       toast.success(m.category_manager_created());
     },
-    onError: () => {
-      toast.error(m.category_manager_unknown_error());
+    onError: (error: Error) => {
+      console.error("[CategoryManager] create error:", error);
+      toast.error(
+        `${m.category_manager_unknown_error()}: ${error?.message || String(error)}`,
+      );
     },
   });
 
