@@ -14,17 +14,12 @@ export function Sidebar({ className }: { className?: string }) {
         <Profile />
       </div>
       <div
-        className="sticky top-4 fuwari-onload-animation"
+        className="sticky top-4 flex flex-col gap-4 fuwari-onload-animation"
         style={{ animationDelay: "150ms" }}
       >
         <Suspense fallback={<TagsSkeleton />}>
           <Tags />
         </Suspense>
-      </div>
-      <div
-        className="sticky top-4 fuwari-onload-animation"
-        style={{ animationDelay: "200ms" }}
-      >
         <Suspense fallback={<CategoriesSkeleton />}>
           <Categories />
         </Suspense>

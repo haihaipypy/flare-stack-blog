@@ -17,7 +17,7 @@ import {
   buildPostWhereClause,
 } from "@/features/posts/data/helper";
 import type { PostListItem } from "@/features/posts/schema/posts.schema";
-import type { PostStatus, Tag } from "@/lib/db/schema";
+import type { Category, PostStatus, Tag } from "@/lib/db/schema";
 import {
   CategoriesTable,
   PostCategoriesTable,
@@ -239,8 +239,33 @@ export async function getPostsCursor(
       tagsByPostId.set(result.postId, existing);
     }
 
+    // Fetch categories for all items
+    const categoriesResults = await db
+      .select({
+        postId: PostCategoriesTable.postId,
+        category: {
+          id: CategoriesTable.id,
+          name: CategoriesTable.name,
+          createdAt: CategoriesTable.createdAt,
+        },
+      })
+      .from(PostCategoriesTable)
+      .innerJoin(
+        CategoriesTable,
+        eq(PostCategoriesTable.categoryId, CategoriesTable.id),
+      )
+      .where(inArray(PostCategoriesTable.postId, postIds));
+
+    const categoriesByPostId = new Map<number, Array<Category>>();
+    for (const result of categoriesResults) {
+      const existing = categoriesByPostId.get(result.postId) ?? [];
+      existing.push(result.category);
+      categoriesByPostId.set(result.postId, existing);
+    }
+
     items.forEach((item) => {
       item.tags = tagsByPostId.get(item.id) ?? [];
+      item.categories = categoriesByPostId.get(item.id) ?? [];
     });
   }
 
@@ -333,12 +358,16 @@ export async function findPinnedPosts(db: DB) {
       postTags: {
         with: { tag: true },
       },
+      postCategories: {
+        with: { category: true },
+      },
     },
   });
 
   return posts.map((p) => ({
     ...p,
     tags: p.postTags.map((pt) => pt.tag),
+    categories: p.postCategories.map((pc) => pc.category),
   }));
 }
 
@@ -366,12 +395,16 @@ export async function findPostsBySlugs(db: DB, slugs: string[]) {
       postTags: {
         with: { tag: true },
       },
+      postCategories: {
+        with: { category: true },
+      },
     },
   });
 
   return posts.map((p) => ({
     ...p,
     tags: p.postTags.map((pt) => pt.tag),
+    categories: p.postCategories.map((pc) => pc.category),
   }));
 }
 

@@ -5,7 +5,8 @@ import {
 } from "drizzle-zod";
 import { z } from "zod";
 import { TagSelectSchema } from "@/features/tags/tags.schema";
-import type { Post, PostStatus, Tag } from "@/lib/db/schema";
+import { CategorySelectSchema } from "@/features/categories/categories.schema";
+import type { Post, PostStatus, Tag, Category } from "@/lib/db/schema";
 import { POST_STATUSES, PostsTable } from "@/lib/db/schema";
 import { NullableJsonContentSchema } from "./json-content.schema";
 
@@ -33,6 +34,7 @@ export const PostItemSchema = PostSelectSchema.omit({
   contentJson: true,
 }).extend({
   tags: z.array(TagSelectSchema).optional(),
+  categories: z.array(CategorySelectSchema).optional(),
 });
 export const PostListResponseSchema = z.object({
   items: z.array(PostItemSchema),
@@ -121,6 +123,7 @@ export type PreviewSummaryInput = z.infer<typeof PreviewSummaryInputSchema>;
 export type StartPostProcessInput = z.infer<typeof StartPostProcessInputSchema>;
 export type PostListItem = Omit<Post, "contentJson" | "publicContentJson"> & {
   tags?: Array<Tag>;
+  categories?: Array<Category>;
 };
 
 export type PostListResponse = z.infer<typeof PostListResponseSchema>;
