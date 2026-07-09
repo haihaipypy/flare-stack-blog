@@ -134,24 +134,35 @@ export const createCategory = async (
   context: DbContext,
   data: CreateCategoryInput,
 ) => {
-  console.log("[createCategory] start, name:", data.name);
-  try {
-    const exists = await CategoryRepo.nameExists(context.db, data.name);
-    console.log("[createCategory] nameExists:", exists);
-    if (exists) {
-      return err({ reason: "CATEGORY_NAME_ALREADY_EXISTS" });
-    }
-
-    const category = await CategoryRepo.insertCategory(context.db, {
-      name: data.name,
-    });
-    console.log("[createCategory] inserted:", category);
-
-    return ok(category);
-  } catch (error) {
-    console.error("[createCategory] error:", error);
-    throw error;
+  const exists = await CategoryRepo.nameExists(context.db, data.name);
+  if (exists) {
+    return err({ reason: "CATEGORY_NAME_ALREADY_EXISTS" });
   }
+
+  // Use raw D1 API to avoid Drizzle inserting NULL for auto-increment id column,
+  // which fails on D1 in certain table creation scenarios.
+  const stmt = context.env.DB.prepare(
+    "INSERT INTO categories (name) VALUES (?1)",
+  ).bind(data.name);
+  const result = await stmt.run();
+
+  if (!result.success) {
+    console.error("[createCategory] D1 insert failed:", result);
+    throw new Error("Failed to create category");
+  }
+
+  const insertId = result.meta.last_row_id;
+  const category = await CategoryRepo.findCategoryById(context.db, insertId);
+
+  if (!category) {
+    console.error(
+      "[createCategory] Category not found after insert, id:",
+      insertId,
+    );
+    throw new Error("Category created but could not be retrieved");
+  }
+
+  return ok(category);
 };
 
 export async function updateCategory(

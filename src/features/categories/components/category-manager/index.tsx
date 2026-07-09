@@ -97,18 +97,9 @@ export function CategoryManager() {
 
   const createCategoryMutation = useMutation({
     mutationFn: async (name: string) => {
-      console.log("[CategoryManager] createCategoryFn called with:", name);
-      try {
-        const result = await createCategoryFn({ data: { name } });
-        console.log("[CategoryManager] createCategoryFn result:", result);
-        return result;
-      } catch (error) {
-        console.error("[CategoryManager] createCategoryFn threw:", error);
-        throw error;
-      }
+      return await createCategoryFn({ data: { name } });
     },
     onSuccess: (result) => {
-      console.log("[CategoryManager] createCategory onSuccess:", result);
       if (result.error) {
         toast.error(m.category_manager_name_exists());
         return;
@@ -118,9 +109,8 @@ export function CategoryManager() {
       setIsCreating(false);
       toast.success(m.category_manager_created());
     },
-    onError: (error) => {
-      console.error("[CategoryManager] createCategory onError:", error);
-      toast.error(`创建失败: ${error instanceof Error ? error.message : String(error)}`);
+    onError: () => {
+      toast.error(m.category_manager_unknown_error());
     },
   });
 
