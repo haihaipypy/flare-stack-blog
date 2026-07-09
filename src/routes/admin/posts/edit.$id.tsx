@@ -1,5 +1,11 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { setPostCategoriesFn } from "@/features/categories/api/categories.api";
+import {
+  CATEGORIES_KEYS,
+  categoriesAdminQueryOptions,
+  categoriesByPostIdQueryOptions,
+} from "@/features/categories/queries";
 import { MEDIA_KEYS } from "@/features/media/queries";
 import { updatePostFn as adminUpdatePostFn } from "@/features/posts/api/posts.admin.api";
 import { PostEditor } from "@/features/posts/components/post-editor";
@@ -23,8 +29,13 @@ export const Route = createFileRoute("/admin/posts/edit/$id")({
     const [post, _] = await Promise.all([
       context.queryClient.ensureQueryData(postByIdQuery(postId)),
       context.queryClient.ensureQueryData(tagsByPostIdQueryOptions(postId)),
+      context.queryClient.ensureQueryData(
+        categoriesByPostIdQueryOptions(postId),
+      ),
       // Prefetch all tags for the selector
       context.queryClient.prefetchQuery(tagsAdminQueryOptions()),
+      // Prefetch all categories for the selector
+      context.queryClient.prefetchQuery(categoriesAdminQueryOptions()),
     ]);
     return { title: post?.title };
   },
@@ -46,8 +57,9 @@ function EditPost() {
   // Since loader ensures data is in cache, these will have initial data immediately.
   const { data: post } = useQuery(postByIdQuery(postId));
   const { data: tags } = useQuery(tagsByPostIdQueryOptions(postId));
+  const { data: categories } = useQuery(categoriesByPostIdQueryOptions(postId));
 
-  if (!post || !tags) {
+  if (!post || !tags || !categories) {
     return (
       <div className="flex items-center justify-center h-[50vh]">
         <div className="text-center space-y-4">
@@ -72,6 +84,7 @@ function EditPost() {
     contentJson: post.contentJson,
     publishedAt: post.publishedAt,
     tagIds: tags.map((t) => t.id),
+    categoryIds: categories.map((c) => c.id),
     pinnedAt: post.pinnedAt,
     isSynced: post.isSynced,
     hasPublicCache: post.hasPublicCache,
@@ -100,6 +113,12 @@ function EditPost() {
           tagIds: data.tagIds,
         },
       }),
+      setPostCategoriesFn({
+        data: {
+          postId: post.id,
+          categoryIds: data.categoryIds,
+        },
+      }),
     ]);
 
     if (updateResult.error) {
@@ -115,6 +134,10 @@ function EditPost() {
 
     queryClient.invalidateQueries({ queryKey: TAGS_KEYS.postTags(postId) });
     queryClient.invalidateQueries({ queryKey: TAGS_KEYS.admin });
+    queryClient.invalidateQueries({
+      queryKey: CATEGORIES_KEYS.postCategories(postId),
+    });
+    queryClient.invalidateQueries({ queryKey: CATEGORIES_KEYS.admin });
     // Replaces predicate: matches ["media", "linked-keys", ...]
     queryClient.invalidateQueries({
       queryKey: MEDIA_KEYS.linked,

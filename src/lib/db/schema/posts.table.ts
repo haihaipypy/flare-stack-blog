@@ -58,9 +58,32 @@ export const PostTagsTable = sqliteTable(
   ],
 );
 
+export const CategoriesTable = sqliteTable("categories", {
+  id,
+  name: text().notNull().unique(),
+  createdAt,
+});
+
+export const PostCategoriesTable = sqliteTable(
+  "post_categories",
+  {
+    postId: integer("post_id")
+      .notNull()
+      .references(() => PostsTable.id, { onDelete: "cascade" }),
+    categoryId: integer("category_id")
+      .notNull()
+      .references(() => CategoriesTable.id, { onDelete: "cascade" }),
+  },
+  (table) => [
+    primaryKey({ columns: [table.postId, table.categoryId] }),
+    index("post_categories_category_idx").on(table.categoryId),
+  ],
+);
+
 // ==================== relations ====================
 export const postsRelations = relations(PostsTable, ({ many }) => ({
   postTags: many(PostTagsTable),
+  postCategories: many(PostCategoriesTable),
 }));
 
 export const tagsRelations = relations(TagsTable, ({ many }) => ({
@@ -78,7 +101,26 @@ export const postTagsRelations = relations(PostTagsTable, ({ one }) => ({
   }),
 }));
 
+export const categoriesRelations = relations(CategoriesTable, ({ many }) => ({
+  postCategories: many(PostCategoriesTable),
+}));
+
+export const postCategoriesRelations = relations(
+  PostCategoriesTable,
+  ({ one }) => ({
+    post: one(PostsTable, {
+      fields: [PostCategoriesTable.postId],
+      references: [PostsTable.id],
+    }),
+    category: one(CategoriesTable, {
+      fields: [PostCategoriesTable.categoryId],
+      references: [CategoriesTable.id],
+    }),
+  }),
+);
+
 // ==================== types ====================
 export type Tag = typeof TagsTable.$inferSelect;
+export type Category = typeof CategoriesTable.$inferSelect;
 export type Post = typeof PostsTable.$inferSelect;
 export type PostStatus = (typeof POST_STATUSES)[number];

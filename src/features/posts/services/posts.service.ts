@@ -67,6 +67,7 @@ export async function getPostsCursor(
       limit: data.limit,
       publicOnly: true,
       tagName: data.tagName,
+      categoryName: data.categoryName,
       excludePinned: data.excludePinned,
     });
 
@@ -76,6 +77,7 @@ export async function getPostsCursor(
     data.limit ?? 10,
     data.cursor ?? 0,
     data.tagName ?? "all",
+    data.categoryName ?? "all",
   );
 
   return await CacheService.get(

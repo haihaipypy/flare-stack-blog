@@ -10,6 +10,7 @@ import postsRelatedRoute from "@/features/posts/api/hono/posts.related.route";
 import searchRoute from "@/features/search/api/hono/search.route";
 import siteDocumentsRoute from "@/features/site-documents/api/hono/site-documents.route";
 import tagsRoute from "@/features/tags/api/hono/tags.list.route";
+import categoriesRoute from "@/features/categories/api/hono/categories.list.route";
 import { serverEnv } from "@/lib/env/server.env";
 import { createRateLimiterIdentifier, getExecutionContext } from "./helper";
 import {
@@ -37,6 +38,7 @@ const publicApi = new Hono<{ Bindings: Env }>()
   .route("/post", postsDetailRoute)
   .route("/post", postsRelatedRoute)
   .route("/tags", tagsRoute)
+  .route("/categories", categoriesRoute)
   .route("/search", searchRoute);
 
 // Mount public API

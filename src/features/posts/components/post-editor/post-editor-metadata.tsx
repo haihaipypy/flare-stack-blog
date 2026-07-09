@@ -3,6 +3,7 @@ import TextareaAutosize from "react-textarea-autosize";
 import DatePicker from "@/components/ui/date-picker";
 import { Input } from "@/components/ui/input";
 import { TagSelector } from "@/features/tags/components/tag-selector";
+import { CategorySelector } from "@/features/categories/components/category-selector";
 import { POST_STATUSES } from "@/lib/db/schema";
 import { toLocalDateString } from "@/lib/utils";
 import { m } from "@/paraglide/messages";
@@ -208,6 +209,16 @@ export function PostEditorMetadata({
           <TagSelector
             value={post.tagIds}
             onChange={(tagIds) => onPostChange({ tagIds })}
+          />
+        </div>
+
+        <div className="col-span-1 space-y-3 md:col-span-3">
+          <label className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground">
+            {m.editor_meta_categories()}
+          </label>
+          <CategorySelector
+            value={post.categoryIds}
+            onChange={(categoryIds) => onPostChange({ categoryIds })}
           />
         </div>
 

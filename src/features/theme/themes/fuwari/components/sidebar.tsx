@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { cn } from "@/lib/utils";
+import { Categories, CategoriesSkeleton } from "./categories";
 import { Profile } from "./profile";
 import { Tags, TagsSkeleton } from "./tags";
 
@@ -18,6 +19,14 @@ export function Sidebar({ className }: { className?: string }) {
       >
         <Suspense fallback={<TagsSkeleton />}>
           <Tags />
+        </Suspense>
+      </div>
+      <div
+        className="fuwari-onload-animation"
+        style={{ animationDelay: "200ms" }}
+      >
+        <Suspense fallback={<CategoriesSkeleton />}>
+          <Categories />
         </Suspense>
       </div>
     </aside>

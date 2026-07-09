@@ -2,6 +2,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
 import {
   FileText,
+  FolderTree,
   Image as ImageIcon,
   LayoutDashboard,
   Link2,
@@ -83,6 +84,12 @@ export function SideBar({
       path: "/admin/tags",
       icon: Tag,
       label: m.admin_sidebar_tags(),
+      exact: false,
+    },
+    {
+      path: "/admin/categories",
+      icon: FolderTree,
+      label: m.admin_sidebar_categories(),
       exact: false,
     },
     {

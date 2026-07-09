@@ -18,7 +18,13 @@ import {
 } from "@/features/posts/data/helper";
 import type { PostListItem } from "@/features/posts/schema/posts.schema";
 import type { PostStatus, Tag } from "@/lib/db/schema";
-import { PostsTable, PostTagsTable, TagsTable } from "@/lib/db/schema";
+import {
+  CategoriesTable,
+  PostCategoriesTable,
+  PostTagsTable,
+  PostsTable,
+  TagsTable,
+} from "@/lib/db/schema";
 
 const DEFAULT_PAGE_SIZE = 12;
 const DEFAULT_SITEMAP_BATCH_SIZE = 500;
@@ -107,6 +113,7 @@ export async function getPostsCursor(
     limit?: number;
     publicOnly?: boolean;
     tagName?: string;
+    categoryName?: string;
     excludePinned?: boolean;
   } = {},
 ): Promise<{
@@ -118,6 +125,7 @@ export async function getPostsCursor(
     limit = DEFAULT_PAGE_SIZE,
     publicOnly,
     tagName,
+    categoryName,
     excludePinned,
   } = options;
 
@@ -156,6 +164,10 @@ export async function getPostsCursor(
     conditions.push(eq(TagsTable.name, tagName));
   }
 
+  if (categoryName) {
+    conditions.push(eq(CategoriesTable.name, categoryName));
+  }
+
   if (excludePinned) {
     conditions.push(sql`${PostsTable.pinnedAt} IS NULL`);
   }
@@ -180,6 +192,18 @@ export async function getPostsCursor(
     query = query
       .innerJoin(PostTagsTable, eq(PostsTable.id, PostTagsTable.postId))
       .innerJoin(TagsTable, eq(PostTagsTable.tagId, TagsTable.id));
+  }
+
+  if (categoryName) {
+    query = query
+      .innerJoin(
+        PostCategoriesTable,
+        eq(PostsTable.id, PostCategoriesTable.postId),
+      )
+      .innerJoin(
+        CategoriesTable,
+        eq(PostCategoriesTable.categoryId, CategoriesTable.id),
+      );
   }
 
   const itemsWithPotentialNext = await query

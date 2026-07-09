@@ -25,6 +25,11 @@ const config = defineConfig(({ mode }) => {
       __THEME_NAME__: JSON.stringify(buildEnv.THEME),
       __THEME_CONFIG__: JSON.stringify(themes[buildEnv.THEME]),
     },
+    optimizeDeps: {
+      esbuildOptions: {
+        external: ["cloudflare:sockets", "cloudflare:workers"],
+      },
+    },
     resolve: {
       alias: {
         "@": path.resolve(__dirname, "./src"),

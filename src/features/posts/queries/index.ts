@@ -38,7 +38,10 @@ export const POSTS_KEYS = {
   revisionDetails: ["posts", "revision-detail"] as const,
 
   // Child keys (functions for specific queries)
-  list: (filters?: { tagName?: string }) => ["posts", "list", filters] as const,
+  list: (filters?: {
+    tagName?: string;
+    categoryName?: string;
+  }) => ["posts", "list", filters] as const,
   detail: (idOrSlug: number | string) => ["posts", "detail", idOrSlug] as const,
   related: (slug: string, limit?: number) =>
     ["posts", "related", slug, limit] as const,
@@ -68,7 +71,7 @@ export function recentPostsQuery(limit: number) {
 }
 
 export function postsInfiniteQueryOptions(
-  filters: { tagName?: string; limit?: number } = {},
+  filters: { tagName?: string; categoryName?: string; limit?: number } = {},
 ) {
   const pageSize = filters.limit ?? 12;
   return infiniteQueryOptions({
@@ -80,6 +83,7 @@ export function postsInfiniteQueryOptions(
             cursor: pageParam,
             limit: pageSize,
             tagName: filters.tagName,
+            categoryName: filters.categoryName,
           },
         });
       }
@@ -88,6 +92,7 @@ export function postsInfiniteQueryOptions(
           cursor: pageParam?.toString(),
           limit: String(pageSize),
           tagName: filters.tagName,
+          categoryName: filters.categoryName,
         },
       });
       if (!res.ok) throw new Error("Failed to fetch posts");
