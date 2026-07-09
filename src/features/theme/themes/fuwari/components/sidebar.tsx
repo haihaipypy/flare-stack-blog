@@ -22,7 +22,7 @@ export function Sidebar({ className }: { className?: string }) {
         </Suspense>
       </div>
       <div
-        className="fuwari-onload-animation"
+        className="sticky top-4 fuwari-onload-animation"
         style={{ animationDelay: "200ms" }}
       >
         <Suspense fallback={<CategoriesSkeleton />}>
