@@ -26,7 +26,11 @@ export function PublicLayout({
   const bannerHeightVh = isHomePage ? BANNER_HEIGHT_HOME : BANNER_HEIGHT_PAGE;
 
   return (
-    <div className="relative min-h-screen bg-(--fuwari-page-bg) transition-colors">
+    <div
+      className={`relative min-h-screen transition-colors ${
+        isHomePage ? "is-home" : "bg-(--fuwari-page-bg)"
+      }`}
+    >
       <MobileMenu
         navOptions={navOptions}
         isOpen={isMenuOpen}
@@ -49,17 +53,28 @@ export function PublicLayout({
       </div>
 
       {/* Banner - full width background */}
-      <div
-        className="absolute left-0 right-0 top-0 z-10 overflow-hidden transition-[height] duration-300 ease-in-out"
-        style={{ height: `${bannerHeightVh}vh` }}
-      >
-        <img
-          src={siteConfig.theme.fuwari.homeBg}
-          alt="banner"
-          fetchPriority="high"
-          className="w-full h-full object-cover object-center"
-        />
-      </div>
+      {isHomePage ? (
+        <div className="fixed left-0 right-0 top-0 bottom-0 z-0 overflow-hidden">
+          <img
+            src={siteConfig.theme.fuwari.homeBg}
+            alt="banner"
+            fetchPriority="high"
+            className="w-full h-full object-cover object-center"
+          />
+        </div>
+      ) : (
+        <div
+          className="absolute left-0 right-0 top-0 z-10 overflow-hidden transition-[height] duration-300 ease-in-out"
+          style={{ height: `${bannerHeightVh}vh` }}
+        >
+          <img
+            src={siteConfig.theme.fuwari.homeBg}
+            alt="banner"
+            fetchPriority="high"
+            className="w-full h-full object-cover object-center"
+          />
+        </div>
+      )}
 
       {/* Main content - overlaps banner by MAIN_OVERLAP_REM */}
       <div

@@ -74,6 +74,11 @@
       color 0.3s;
   }
 
+  /* Homepage: make cards 80% opaque so the full-screen banner shows through */
+  .is-home .fuwari-card-base {
+    background-color: color-mix(in srgb, var(--fuwari-card-bg) 80%, transparent);
+  }
+
   .fuwari-btn-regular {
     display: flex;
     align-items: center;
