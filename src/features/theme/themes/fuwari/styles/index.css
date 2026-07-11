@@ -79,6 +79,11 @@
     background-color: color-mix(in srgb, var(--fuwari-card-bg) 80%, transparent);
   }
 
+  /* Homepage: footer box also gets 80% opaque background for readability */
+  .is-home .fuwari-footer {
+    background-color: color-mix(in srgb, var(--fuwari-card-bg) 80%, transparent);
+  }
+
   .fuwari-btn-regular {
     display: flex;
     align-items: center;
