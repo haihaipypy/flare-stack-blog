@@ -1,9 +1,11 @@
 import { Link, useRouteContext } from "@tanstack/react-router";
-import { Home, Menu, Search, UserIcon } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { ChevronDown, Home, Menu, Search, UserIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ThemeToggle } from "@/components/common/theme-toggle";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { NavOption, UserInfo } from "@/features/theme/contract/layouts";
+import { categoriesQueryOptions } from "@/features/categories/queries";
 import { m } from "@/paraglide/messages";
 import { LanguageSwitcher } from "./language-switcher";
 
@@ -27,6 +29,7 @@ export function Navbar({
 }: NavbarProps) {
   const { siteConfig } = useRouteContext({ from: "__root__" });
   const [isHidden, setIsHidden] = useState(false);
+  const { data: navCategories } = useQuery(categoriesQueryOptions);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -80,18 +83,54 @@ export function Navbar({
           </Link>
 
           <nav className="hidden md:flex items-center gap-1">
-            {navOptions.map((option) => (
-              <Link
-                key={option.id}
-                to={option.to}
-                className="fuwari-expand-animation rounded-lg h-11 font-bold px-5 active:scale-95 flex items-center fuwari-text-75 hover:text-(--fuwari-primary)"
-                activeProps={{
-                  className: "!text-[var(--fuwari-primary)]",
-                }}
-              >
-                {option.label}
-              </Link>
-            ))}
+            {navOptions.map((option) =>
+              option.id === "categories" ? (
+                <div key={option.id} className="relative group">
+                  <Link
+                    to={option.to}
+                    className="fuwari-expand-animation rounded-lg h-11 font-bold px-5 active:scale-95 flex items-center gap-1 fuwari-text-75 hover:text-(--fuwari-primary)"
+                    activeProps={{
+                      className: "!text-[var(--fuwari-primary)]",
+                    }}
+                  >
+                    {option.label}
+                    <ChevronDown
+                      size={14}
+                      strokeWidth={2}
+                      className="mt-0.5 transition-transform duration-200 group-hover:rotate-180"
+                    />
+                  </Link>
+                  <div className="absolute left-0 top-full pt-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                    <div className="fuwari-card-base rounded-xl py-2 px-1 min-w-44 max-h-80 overflow-y-auto flex flex-col gap-0.5 shadow-lg ring-1 ring-black/5 dark:ring-white/10">
+                      {(navCategories ?? []).map((cat) => (
+                        <Link
+                          key={cat.id}
+                          to="/posts"
+                          search={{ categoryName: cat.name }}
+                          className="flex items-center justify-between gap-3 px-3 py-1.5 rounded-lg text-sm fuwari-text-75 hover:bg-(--fuwari-btn-regular-bg) hover:text-(--fuwari-primary) whitespace-nowrap"
+                        >
+                          <span>{cat.name}</span>
+                          <span className="text-xs opacity-50">
+                            {cat.postCount}
+                          </span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <Link
+                  key={option.id}
+                  to={option.to}
+                  className="fuwari-expand-animation rounded-lg h-11 font-bold px-5 active:scale-95 flex items-center fuwari-text-75 hover:text-(--fuwari-primary)"
+                  activeProps={{
+                    className: "!text-[var(--fuwari-primary)]",
+                  }}
+                >
+                  {option.label}
+                </Link>
+              ),
+            )}
           </nav>
 
           <div className="flex items-center gap-1">

@@ -1,6 +1,9 @@
 import { Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { Fragment } from "react";
 import { LogOut, Settings, User as UserIcon } from "lucide-react";
 import type { NavOption, UserInfo } from "@/features/theme/contract/layouts";
+import { categoriesQueryOptions } from "@/features/categories/queries";
 import { cn } from "@/lib/utils";
 import { m } from "@/paraglide/messages";
 
@@ -19,6 +22,8 @@ export function MobileMenu({
   user,
   logout,
 }: MobileMenuProps) {
+  const { data: menuCategories } = useQuery(categoriesQueryOptions);
+
   return (
     <>
       {/* Backdrop */}
@@ -43,18 +48,34 @@ export function MobileMenu({
           {/* Navigation Items */}
           <nav className="flex flex-col">
             {navOptions.map((item) => (
-              <Link
-                key={item.id}
-                to={item.to}
-                onClick={onClose}
-                className="flex items-center w-full px-4 py-2.5 text-sm font-medium rounded-lg transition-colors fuwari-text-75 hover:bg-(--fuwari-btn-regular-bg) hover:text-(--fuwari-primary) active:scale-[0.98]"
-                activeProps={{
-                  className:
-                    "!bg-[var(--fuwari-btn-regular-bg)] !text-[var(--fuwari-primary)]",
-                }}
-              >
-                {item.label}
-              </Link>
+              <Fragment key={item.id}>
+                <Link
+                  to={item.to}
+                  onClick={onClose}
+                  className="flex items-center w-full px-4 py-2.5 text-sm font-medium rounded-lg transition-colors fuwari-text-75 hover:bg-(--fuwari-btn-regular-bg) hover:text-(--fuwari-primary) active:scale-[0.98]"
+                  activeProps={{
+                    className:
+                      "!bg-[var(--fuwari-btn-regular-bg)] !text-[var(--fuwari-primary)]",
+                  }}
+                >
+                  {item.label}
+                </Link>
+                {item.id === "categories" &&
+                  (menuCategories ?? []).map((cat) => (
+                    <Link
+                      key={cat.id}
+                      to="/posts"
+                      search={{ categoryName: cat.name }}
+                      onClick={onClose}
+                      className="flex items-center justify-between w-full pl-9 pr-4 py-1.5 text-sm rounded-lg transition-colors fuwari-text-50 hover:bg-(--fuwari-btn-regular-bg) hover:text-(--fuwari-primary) active:scale-[0.98]"
+                    >
+                      <span>{cat.name}</span>
+                      <span className="text-xs opacity-50">
+                        {cat.postCount}
+                      </span>
+                    </Link>
+                  ))}
+              </Fragment>
             ))}
 
             {user?.role === "admin" && (

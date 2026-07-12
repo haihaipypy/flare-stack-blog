@@ -2,6 +2,7 @@
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "nav_home": "主页",
   "nav_posts": "文章",
+  "nav_categories": "分类",
   "nav_friend_links": "友链",
   "nav_search": "搜索",
   "nav_login": "登录",
