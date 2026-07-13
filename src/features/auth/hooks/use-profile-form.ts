@@ -17,6 +17,11 @@ const createProfileSchema = (messages: Messages) =>
       .union([
         z.literal(""),
         z.string().url(messages.profile_validation_avatar_invalid()).trim(),
+        // Allow local avatar-library paths like /avatars/person-1.svg
+        z
+          .string()
+          .regex(/^\//, messages.profile_validation_avatar_invalid())
+          .trim(),
       ])
       .optional(),
   });
@@ -33,6 +38,8 @@ export function useProfileForm(options: UseProfileFormOptions) {
   const {
     register,
     handleSubmit,
+    watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<ProfileSchema>({
     resolver: standardSchemaResolver(createProfileSchema(m)),
@@ -64,6 +71,8 @@ export function useProfileForm(options: UseProfileFormOptions) {
     errors,
     handleSubmit: handleSubmit(onSubmit),
     isSubmitting,
+    watch,
+    setValue,
   };
 }
 

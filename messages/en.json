@@ -217,6 +217,8 @@
   "profile_name": "Nickname",
   "profile_avatar_url": "Avatar URL",
   "profile_avatar_url_placeholder": "https://...",
+  "profile_avatar_library": "Avatar Library",
+  "profile_avatar_library_desc": "Pick a preset avatar, or paste an image URL above",
   "profile_save_changes": "Save Changes",
   "profile_save_changes_fuwari": "Save Changes",
   "profile_saving": "Saving...",

@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { CodeSquare, Loader2, LogOut, Settings2, Shield } from "lucide-react";
 import type { ProfilePageProps } from "@/features/theme/contract/pages";
+import { avatarLibrary } from "@/features/theme/themes/fuwari/avatar-library";
 import { cn } from "@/lib/utils";
 import { m } from "@/paraglide/messages";
 
@@ -15,6 +16,8 @@ export function ProfilePage({
     "w-full px-4 py-2.5 rounded-xl border border-(--fuwari-input-border) bg-(--fuwari-input-bg) focus:outline-none focus:ring-2 focus:ring-(--fuwari-primary)/50 focus:border-transparent transition-all fuwari-text-90 placeholder:text-black/30 dark:placeholder:text-white/30";
   const labelClassName =
     "block text-sm font-medium fuwari-text-75 mb-1.5 transition-colors";
+
+  const currentImage = profileForm.watch("image");
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-4xl mx-auto pb-12">
@@ -98,6 +101,43 @@ export function ProfilePage({
                     {profileForm.errors.image.message}
                   </span>
                 )}
+              </div>
+
+              {/* Avatar library */}
+              <div className="mt-3">
+                <p className={labelClassName}>{m.profile_avatar_library()}</p>
+                <p className="text-xs text-(--fuwari-btn-content) mb-2">
+                  {m.profile_avatar_library_desc()}
+                </p>
+                <div className="grid grid-cols-6 gap-2">
+                  {avatarLibrary.map((avatar) => {
+                    const selected = currentImage === avatar.src;
+                    return (
+                      <button
+                        key={avatar.src}
+                        type="button"
+                        title={avatar.label}
+                        onClick={() =>
+                          profileForm.setValue("image", avatar.src, {
+                            shouldDirty: true,
+                          })
+                        }
+                        className={cn(
+                          "aspect-square rounded-xl overflow-hidden border-2 transition-all active:scale-95 hover:border-(--fuwari-primary)",
+                          selected
+                            ? "border-(--fuwari-primary) ring-2 ring-(--fuwari-primary)/40"
+                            : "border-transparent",
+                        )}
+                      >
+                        <img
+                          src={avatar.src}
+                          alt={avatar.label}
+                          className="w-full h-full object-cover"
+                        />
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               <div className="pt-2">

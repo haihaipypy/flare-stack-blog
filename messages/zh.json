@@ -210,6 +210,8 @@
   "profile_name": "昵称",
   "profile_avatar_url": "头像链接",
   "profile_avatar_url_placeholder": "https://...",
+  "profile_avatar_library": "头像库",
+  "profile_avatar_library_desc": "选择一个预设头像，或在上方手动填写图片链接",
   "profile_save_changes": "保存更改",
   "profile_save_changes_fuwari": "保存更改",
   "profile_saving": "保存中...",

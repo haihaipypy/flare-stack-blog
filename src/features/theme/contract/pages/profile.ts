@@ -1,4 +1,9 @@
-import type { FieldErrors, UseFormRegister } from "react-hook-form";
+import type {
+  FieldErrors,
+  UseFormRegister,
+  UseFormSetValue,
+  UseFormWatch,
+} from "react-hook-form";
 
 export interface ProfileUserInfo {
   id: string;
@@ -18,6 +23,8 @@ export interface ProfileFormData {
   errors: FieldErrors<ProfileSchema>;
   handleSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;
   isSubmitting: boolean;
+  watch: UseFormWatch<ProfileSchema>;
+  setValue: UseFormSetValue<ProfileSchema>;
 }
 
 export interface PasswordSchema {
