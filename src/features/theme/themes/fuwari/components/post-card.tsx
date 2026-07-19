@@ -134,7 +134,7 @@ export function PostCard({
           className={`fuwari-text-75 pr-4 wrap-break-word ${
             pinned
               ? "mb-4 line-clamp-3 md:line-clamp-2 text-lg leading-relaxed"
-              : "mb-3.5 line-clamp-2 md:line-clamp-1"
+              : "mb-3.5 line-clamp-2 md:line-clamp-2"
           }`}
         >
           {post.summary ?? ""}
