@@ -25,6 +25,12 @@ export const app = new Hono<{ Bindings: Env }>();
 
 app.get("*", cacheMiddleware);
 
+// Legacy inbound links from the old site used the /archives/<slug> prefix.
+// Redirect them to the current /post/<slug> route so they don't dead-end at 404.
+app.get("/archives/:rest{.+}", (c) => {
+  return c.redirect(`/post/${c.req.param("rest")}`, 301);
+});
+
 async function forwardAuthRequest(c: Context<{ Bindings: Env }>) {
   const auth = c.get("auth");
   return auth.handler(c.req.raw);

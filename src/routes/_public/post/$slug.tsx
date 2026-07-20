@@ -65,7 +65,7 @@ export const Route = createFileRoute("/_public/post/$slug")({
 
     const meta: Array<Record<string, string>> = [
       {
-        title: post?.title,
+        title: post?.title ?? "",
       },
       {
         name: "description",

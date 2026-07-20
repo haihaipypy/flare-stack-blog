@@ -35,32 +35,46 @@ export class PostAutoSnapshotWorkflow extends WorkflowEntrypoint<Env, Params> {
 
     await step.do("create auto snapshot revision", async () => {
       const db = getDb(this.env);
-      const result = await PostRevisionService.createPostRevision(
-        { db, env: this.env },
-        {
-          postId: event.payload.postId,
-          reason: "auto",
-        },
-      );
 
-      if (result.error) {
-        logPostAutoSnapshot(this.env, "workflow_create_revision_failed", {
+      try {
+        const result = await PostRevisionService.createPostRevision(
+          { db, env: this.env },
+          {
+            postId: event.payload.postId,
+            reason: "auto",
+          },
+        );
+
+        if (result.error) {
+          logPostAutoSnapshot(this.env, "workflow_create_revision_failed", {
+            postId: event.payload.postId,
+            workflowInstanceId: event.instanceId,
+            reason: result.error.reason,
+          });
+          return { created: false };
+        }
+
+        logPostAutoSnapshot(this.env, "workflow_create_revision_completed", {
           postId: event.payload.postId,
           workflowInstanceId: event.instanceId,
-          reason: result.error.reason,
+          created: result.data.created,
+          skipReason: result.data.skipReason ?? null,
+          revisionId: result.data.revision?.id ?? null,
+        });
+
+        return result.data;
+      } catch (error) {
+        // Surface the real cause instead of letting the workflow bubble an
+        // opaque "workflow" exception. A failed auto-snapshot must never
+        // abort the publish pipeline, so we log and return gracefully.
+        logPostAutoSnapshot(this.env, "workflow_create_revision_threw", {
+          postId: event.payload.postId,
+          workflowInstanceId: event.instanceId,
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack ?? null : null,
         });
         return { created: false };
       }
-
-      logPostAutoSnapshot(this.env, "workflow_create_revision_completed", {
-        postId: event.payload.postId,
-        workflowInstanceId: event.instanceId,
-        created: result.data.created,
-        skipReason: result.data.skipReason ?? null,
-        revisionId: result.data.revision?.id ?? null,
-      });
-
-      return result.data;
     });
   }
 
