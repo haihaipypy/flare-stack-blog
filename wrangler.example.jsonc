@@ -180,3 +180,14 @@
     }
   }
 }
+
+// ============================================================
+// 服务端环境变量（secret / 通过 Cloudflare Dashboard 或真实
+// wrangler.jsonc 的 "vars" 注入，不要提交到仓库）
+// ============================================================
+// BAIDU_PUSH_TOKEN: 可选。百度搜索资源平台 -> 普通收录 -> API提交
+//   中获取的 token。配置后，发布/更新文章会自动推送 URL 到百度，
+//   加快收录。留空则不启用百度主动推送。
+//   在真实 wrangler.jsonc 中添加：
+//     "vars": { "BAIDU_PUSH_TOKEN": "your-token" }
+//   或通过 `wrangler secret put BAIDU_PUSH_TOKEN` 设置。

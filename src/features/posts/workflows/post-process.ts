@@ -12,6 +12,7 @@ import {
   upsertPostSearchIndex,
 } from "@/features/posts/workflows/helpers";
 import * as SearchService from "@/features/search/service/search.service";
+import { pushUrlsToBaidu } from "@/features/seo/baidu-push";
 import { getDb } from "@/lib/db";
 
 interface Params {
@@ -145,6 +146,14 @@ export class PostProcessWorkflow extends WorkflowEntrypoint<Env, Params> {
         POSTS_CACHE_KEYS.syncHash(postId),
         hash,
       );
+    });
+
+    // Push to Baidu for faster indexing; best-effort, never breaks publishing.
+    await step.do("push to Baidu", async () => {
+      const postUrl = `https://${this.env.DOMAIN}/post/${encodeURIComponent(
+        updatedPost.slug,
+      )}`;
+      await pushUrlsToBaidu(this.env, [postUrl]);
     });
   }
 

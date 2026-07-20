@@ -6,6 +6,7 @@ import {
   invalidatePostCaches,
   upsertPostSearchIndex,
 } from "@/features/posts/workflows/helpers";
+import { pushUrlsToBaidu } from "@/features/seo/baidu-push";
 
 interface Params {
   postId: number;
@@ -33,6 +34,14 @@ export class ScheduledPublishWorkflow extends WorkflowEntrypoint<Env, Params> {
 
     await step.do("update search index", async () => {
       await upsertPostSearchIndex(this.env, post);
+    });
+
+    // Push to Baidu for faster indexing; best-effort, never breaks publishing.
+    await step.do("push to Baidu", async () => {
+      const postUrl = `https://${this.env.DOMAIN}/post/${encodeURIComponent(
+        post.slug,
+      )}`;
+      await pushUrlsToBaidu(this.env, [postUrl]);
     });
   }
 }

@@ -22,6 +22,7 @@ interface __BaseEnv_Env {
 	PAGEVIEW_SALT: string;
 	TURNSTILE_SECRET_KEY: string;
 	GITHUB_TOKEN: string;
+	BAIDU_PUSH_TOKEN?: string;
 	RATE_LIMITER: DurableObjectNamespace<import("./src/server").RateLimiter>;
 	PASSWORD_HASHER: DurableObjectNamespace<import("./src/server").PasswordHasher>;
 	POST_PROCESS_WORKFLOW: Workflow<Parameters<import("./src/server").PostProcessWorkflow['run']>[0]['payload']>;
