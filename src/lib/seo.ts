@@ -1,6 +1,8 @@
 type ArticleJsonLdInput = {
   authorName: string;
   canonicalHref: string;
+  siteName: string;
+  imageUrl?: string | null;
   post: {
     slug: string;
     summary?: string | null;
@@ -50,11 +52,13 @@ export function canonicalLink(href: string) {
 export function buildArticleJsonLd({
   authorName,
   canonicalHref,
+  siteName,
+  imageUrl,
   post,
 }: ArticleJsonLdInput) {
   const jsonLd: Record<string, unknown> = {
     "@context": "https://schema.org",
-    "@type": "Article",
+    "@type": "BlogPosting",
     headline: post.title,
     url: canonicalHref,
     mainEntityOfPage: {
@@ -65,8 +69,16 @@ export function buildArticleJsonLd({
       "@type": "Person",
       name: authorName,
     },
+    publisher: {
+      "@type": "Organization",
+      name: siteName,
+    },
     dateModified: new Date(post.updatedAt).toISOString(),
   };
+
+  if (imageUrl) {
+    jsonLd.image = imageUrl;
+  }
 
   if (post.summary) {
     jsonLd.description = post.summary;
