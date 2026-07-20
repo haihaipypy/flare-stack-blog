@@ -1,4 +1,8 @@
-import type { WorkflowEvent, WorkflowStep } from "cloudflare:workers";
+import type {
+  WorkflowEvent,
+  WorkflowStep,
+  WorkflowStepContext,
+} from "cloudflare:workers";
 import { WorkflowEntrypoint } from "cloudflare:workers";
 import * as CacheService from "@/features/cache/cache.service";
 import * as PostRepo from "@/features/posts/data/posts.data";
@@ -75,7 +79,34 @@ export class PostProcessWorkflow extends WorkflowEntrypoint<Env, Params> {
 
     if (shouldSkip || !initialPost) return;
 
-    // 2. Generate summary
+    // Helper: run a step but never let it abort the whole workflow.
+    // Any failure is logged with the step name so the source of the
+    // post-process exception can be pinpointed from Worker logs.
+    const safeStep = async (
+      name: string,
+      fn: (ctx: WorkflowStepContext) => Promise<unknown>,
+    ): Promise<void> => {
+      try {
+        // step.do's callback type requires a Serializable return; our steps are
+        // side-effecting and their values are unused, so widen via unknown.
+        await step.do(
+          name,
+          fn as unknown as (ctx: WorkflowStepContext) => Promise<void>,
+        );
+      } catch (error) {
+        console.warn(
+          JSON.stringify({
+            message: "post-process step failed",
+            step: name,
+            postId,
+            error: error instanceof Error ? error.message : String(error),
+          }),
+        );
+      }
+    };
+
+    // 2. Generate summary (best-effort — must NOT block later steps
+    //    like Baidu push even if summary generation fails).
     const updatedPost = await step.do(
       `generate summary for post ${postId}`,
       {
@@ -97,10 +128,9 @@ export class PostProcessWorkflow extends WorkflowEntrypoint<Env, Params> {
         return result.data;
       },
     );
-    if (!updatedPost) return;
 
     // 3. Persist the highlighted public snapshot used by SSR/read paths.
-    await step.do("build public content", async () => {
+    await safeStep("build public content", async (_ctx) => {
       const db = getDb(this.env);
       const post = await PostRepo.findPostById(db, postId);
       if (!post) return;
@@ -115,19 +145,21 @@ export class PostProcessWorkflow extends WorkflowEntrypoint<Env, Params> {
     // 4. Update search index (skip for future posts — ScheduledPublishWorkflow handles it)
     const isFuturePost = !!event.payload.isFuturePost;
 
-    if (!isFuturePost) {
-      await step.do("update search index", async () => {
+    if (!isFuturePost && updatedPost) {
+      await safeStep("update search index", async (_ctx) => {
         return await upsertPostSearchIndex(this.env, updatedPost);
       });
     }
 
     // 5. Invalidate caches
-    await step.do("invalidate caches", async () => {
-      await invalidatePostCaches(this.env, updatedPost.slug);
-    });
+    if (updatedPost) {
+      await safeStep("invalidate caches", async (_ctx) => {
+        await invalidatePostCaches(this.env, updatedPost.slug);
+      });
+    }
 
     // 6. Update sync hash in KV
-    await step.do("update sync hash", async () => {
+    await safeStep("update sync hash", async (_ctx) => {
       const p = await fetchPost(this.env, postId);
       if (!p) return;
 
@@ -149,11 +181,14 @@ export class PostProcessWorkflow extends WorkflowEntrypoint<Env, Params> {
     });
 
     // Push to Baidu for faster indexing; best-effort, never breaks publishing.
-    await step.do("push to Baidu", async () => {
-      const postUrl = `https://${this.env.DOMAIN}/post/${encodeURIComponent(
-        updatedPost.slug,
-      )}`;
-      await pushUrlsToBaidu(this.env, [postUrl]);
+    // Runs last and independently so a prior step failure cannot swallow it.
+    const baiduUrl = updatedPost
+      ? `https://${this.env.DOMAIN}/post/${encodeURIComponent(updatedPost.slug)}`
+      : `https://${this.env.DOMAIN}/post/${encodeURIComponent(
+          initialPost.slug,
+        )}`;
+    await safeStep("push to Baidu", async (_ctx) => {
+      await pushUrlsToBaidu(this.env, [baiduUrl]);
     });
   }
 
