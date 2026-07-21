@@ -58,11 +58,13 @@ export const McpFriendLinkCreateInputSchema = z.object({
     .optional()
     .describe("Short site description."),
   logoUrl: z
-    .union([z.literal(""), z.string().url()])
+    .string()
+    .url()
     .optional()
     .describe("Logo image URL."),
   contactEmail: z
-    .union([z.literal(""), z.string().email()])
+    .string()
+    .email()
     .optional()
     .describe("Contact email address."),
 });
@@ -83,11 +85,13 @@ export const McpFriendLinkUpdateInputSchema = z
       .optional()
       .describe("Updated site description."),
     logoUrl: z
-      .union([z.literal(""), z.string().url()])
+      .string()
+      .url()
       .optional()
       .describe("Updated logo image URL."),
     contactEmail: z
-      .union([z.literal(""), z.string().email()])
+      .string()
+      .email()
       .optional()
       .describe("Updated contact email address."),
     status: z
