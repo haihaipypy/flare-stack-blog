@@ -71,7 +71,7 @@ export class PostAutoSnapshotWorkflow extends WorkflowEntrypoint<Env, Params> {
           postId: event.payload.postId,
           workflowInstanceId: event.instanceId,
           error: error instanceof Error ? error.message : String(error),
-          stack: error instanceof Error ? error.stack ?? null : null,
+          stack: error instanceof Error ? (error.stack ?? null) : null,
         });
         return { created: false };
       }

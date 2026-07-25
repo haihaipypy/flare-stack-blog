@@ -57,11 +57,7 @@ export const McpFriendLinkCreateInputSchema = z.object({
     .max(300)
     .optional()
     .describe("Short site description."),
-  logoUrl: z
-    .string()
-    .url()
-    .optional()
-    .describe("Logo image URL."),
+  logoUrl: z.string().url().optional().describe("Logo image URL."),
   contactEmail: z
     .string()
     .email()
@@ -84,11 +80,7 @@ export const McpFriendLinkUpdateInputSchema = z
       .max(300)
       .optional()
       .describe("Updated site description."),
-    logoUrl: z
-      .string()
-      .url()
-      .optional()
-      .describe("Updated logo image URL."),
+    logoUrl: z.string().url().optional().describe("Updated logo image URL."),
     contactEmail: z
       .string()
       .email()

@@ -12,18 +12,12 @@ export const CATEGORIES_KEYS = {
   public: ["categories", "public"] as const,
   lists: ["categories", "list"] as const,
   admin: ["categories", "admin"] as const,
-  list: (filters: {
-    sortBy?: string;
-    sortDir?: string;
-  }) => ["categories", "list", filters] as const,
-  adminList: (filters: {
-    sortBy?: string;
-    sortDir?: string;
-  }) => ["categories", "admin", filters] as const,
-  adminWithCount: (filters: {
-    sortBy?: string;
-    sortDir?: string;
-  }) => ["categories", "admin", "with-count", filters] as const,
+  list: (filters: { sortBy?: string; sortDir?: string }) =>
+    ["categories", "list", filters] as const,
+  adminList: (filters: { sortBy?: string; sortDir?: string }) =>
+    ["categories", "admin", filters] as const,
+  adminWithCount: (filters: { sortBy?: string; sortDir?: string }) =>
+    ["categories", "admin", "with-count", filters] as const,
   postCategories: (postId: number) => ["post", postId, "categories"] as const,
 };
 

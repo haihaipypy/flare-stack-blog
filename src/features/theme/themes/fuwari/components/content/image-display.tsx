@@ -26,7 +26,6 @@ export function ImageDisplay({
           className="w-full h-auto transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] scale-100 group-hover:scale-[1.01]"
         />
       </div>
-
     </figure>
   );
 }

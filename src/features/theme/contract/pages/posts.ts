@@ -1,6 +1,6 @@
+import type { CategoryWithCount } from "@/features/categories/categories.schema";
 import type { PostItem } from "@/features/posts/schema/posts.schema";
 import type { TagWithCount } from "@/features/tags/tags.schema";
-import type { CategoryWithCount } from "@/features/categories/categories.schema";
 
 export interface PostsPageProps {
   posts: Array<PostItem>;

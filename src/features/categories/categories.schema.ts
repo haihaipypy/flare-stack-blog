@@ -36,7 +36,9 @@ export const SetPostCategoriesInputSchema = z.object({
   postId: z.number(),
   categoryIds: z.array(z.number()),
 });
-export const GetCategoriesByPostIdInputSchema = z.object({ postId: z.number() });
+export const GetCategoriesByPostIdInputSchema = z.object({
+  postId: z.number(),
+});
 
 export const CATEGORIES_CACHE_KEYS = {
   publicList: ["public", "categories", "list"] as const,

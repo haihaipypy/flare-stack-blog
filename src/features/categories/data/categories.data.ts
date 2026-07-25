@@ -22,10 +22,7 @@ export async function getAllCategories(
   const orderColumn =
     sortBy === "createdAt" ? CategoriesTable.createdAt : CategoriesTable.name;
 
-  return await db
-    .select()
-    .from(CategoriesTable)
-    .orderBy(orderFn(orderColumn));
+  return await db.select().from(CategoriesTable).orderBy(orderFn(orderColumn));
 }
 
 /**
@@ -106,10 +103,7 @@ export async function insertCategory(
   db: DB,
   data: typeof CategoriesTable.$inferInsert,
 ) {
-  const [category] = await db
-    .insert(CategoriesTable)
-    .values(data)
-    .returning();
+  const [category] = await db.insert(CategoriesTable).values(data).returning();
   return category;
 }
 
@@ -210,10 +204,7 @@ export async function nameExists(
 /**
  * Delete all category associations for a post.
  */
-export async function deletePostCategoryAssociations(
-  db: DB,
-  postId: number,
-) {
+export async function deletePostCategoryAssociations(db: DB, postId: number) {
   await db
     .delete(PostCategoriesTable)
     .where(eq(PostCategoriesTable.postId, postId));

@@ -12,12 +12,12 @@ import {
   deleteCategoryFn,
   updateCategoryFn,
 } from "@/features/categories/api/categories.api";
+import type { CreateCategoryInput } from "@/features/categories/categories.schema";
+import { CreateCategoryInputSchema } from "@/features/categories/categories.schema";
 import {
   CATEGORIES_KEYS,
   categoriesWithCountAdminQueryOptions,
 } from "@/features/categories/queries";
-import type { CreateCategoryInput } from "@/features/categories/categories.schema";
-import { CreateCategoryInputSchema } from "@/features/categories/categories.schema";
 import { cn } from "@/lib/utils";
 import { m } from "@/paraglide/messages";
 
@@ -473,8 +473,7 @@ export function CategoryManager() {
         isOpen={!!categoryToDelete}
         onClose={() => setCategoryToDelete(null)}
         onConfirm={() =>
-          categoryToDelete &&
-          deleteCategoryMutation.mutate(categoryToDelete.id)
+          categoryToDelete && deleteCategoryMutation.mutate(categoryToDelete.id)
         }
         title={m.category_manager_delete_title()}
         message={

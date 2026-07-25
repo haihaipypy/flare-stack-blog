@@ -36,8 +36,7 @@ export function CategorySelector({
   } = useQuery(categoriesAdminQueryOptions());
 
   const createCategoryMutation = useMutation({
-    mutationFn: async (name: string) =>
-      createCategoryFn({ data: { name } }),
+    mutationFn: async (name: string) => createCategoryFn({ data: { name } }),
 
     onMutate: async (newCategoryName) => {
       await queryClient.cancelQueries({
@@ -68,7 +67,10 @@ export function CategorySelector({
       onChange([...value, optimisticCategory.id]);
       setSearchTerm("");
 
-      return { previousCategories, optimisticCategoryId: optimisticCategory.id };
+      return {
+        previousCategories,
+        optimisticCategoryId: optimisticCategory.id,
+      };
     },
 
     onSuccess: (result, _variables, context) => {
@@ -113,9 +115,7 @@ export function CategorySelector({
           );
         }
         if (context?.optimisticCategoryId) {
-          onChange(
-            value.filter((id) => id !== context.optimisticCategoryId),
-          );
+          onChange(value.filter((id) => id !== context.optimisticCategoryId));
         }
       }
 
@@ -187,8 +187,7 @@ export function CategorySelector({
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const isInitialLoading = isCategoriesLoading && categories.length === 0;

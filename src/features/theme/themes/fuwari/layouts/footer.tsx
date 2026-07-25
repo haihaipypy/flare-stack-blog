@@ -14,7 +14,6 @@ export function Footer(_: FooterProps) {
     <>
       <div className="border-t border-black/10 dark:border-white/15 my-10 border-dashed mx-4 md:mx-32" />
       <div className="fuwari-footer border-dashed border-black/10 dark:border-white/15 rounded-2xl mb-12 flex flex-col items-center justify-center px-6 py-8 gap-2">
-
         {/* 版权 */}
         <div className="fuwari-text-50 text-sm text-center">
           <ClientOnly fallback="-">
@@ -90,7 +89,6 @@ export function Footer(_: FooterProps) {
             </a>
           </span>
         </div>
-
       </div>
     </>
   );

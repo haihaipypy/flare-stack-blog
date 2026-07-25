@@ -21,8 +21,8 @@ import type { Category, PostStatus, Tag } from "@/lib/db/schema";
 import {
   CategoriesTable,
   PostCategoriesTable,
-  PostTagsTable,
   PostsTable,
+  PostTagsTable,
   TagsTable,
 } from "@/lib/db/schema";
 

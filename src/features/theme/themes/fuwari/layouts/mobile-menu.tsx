@@ -1,9 +1,9 @@
-import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { Fragment } from "react";
+import { Link } from "@tanstack/react-router";
 import { LogOut, Settings, User as UserIcon } from "lucide-react";
-import type { NavOption, UserInfo } from "@/features/theme/contract/layouts";
+import { Fragment } from "react";
 import { categoriesQueryOptions } from "@/features/categories/queries";
+import type { NavOption, UserInfo } from "@/features/theme/contract/layouts";
 import { cn } from "@/lib/utils";
 import { m } from "@/paraglide/messages";
 

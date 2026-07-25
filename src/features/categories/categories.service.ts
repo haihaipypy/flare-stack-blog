@@ -1,9 +1,5 @@
 import { z } from "zod";
 import * as CacheService from "@/features/cache/cache.service";
-import * as PostRepo from "@/features/posts/data/posts.data";
-import { POSTS_CACHE_KEYS } from "@/features/posts/schema/posts.schema";
-import * as PostAutoSnapshotService from "@/features/posts/services/post-auto-snapshot.service";
-import * as CategoryRepo from "@/features/categories/data/categories.data";
 import type {
   Category,
   CategoryWithCount,
@@ -18,6 +14,10 @@ import {
   CATEGORIES_CACHE_KEYS,
   CategoryWithCountSchema,
 } from "@/features/categories/categories.schema";
+import * as CategoryRepo from "@/features/categories/data/categories.data";
+import * as PostRepo from "@/features/posts/data/posts.data";
+import { POSTS_CACHE_KEYS } from "@/features/posts/schema/posts.schema";
+import * as PostAutoSnapshotService from "@/features/posts/services/post-auto-snapshot.service";
 import { err, ok } from "@/lib/errors";
 import { purgeCDNCache } from "@/lib/invalidate";
 
@@ -144,11 +144,12 @@ export const createCategory = async (
   // (e.g. slug) that Drizzle's schema doesn't know about. We introspect the table
   // schema and supply values for every NOT NULL column we recognize.
   const now = Math.floor(Date.now() / 1000);
-  const slug = data.name
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, "-")
-    .replace(/^-+|-+$/g, "") || `cat-${now}`;
+  const slug =
+    data.name
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\u4e00-\u9fa5]+/g, "-")
+      .replace(/^-+|-+$/g, "") || `cat-${now}`;
 
   const tableInfo = await context.env.DB.prepare(
     "PRAGMA table_info(categories)",
@@ -187,7 +188,10 @@ export const createCategory = async (
   const result = await stmt.run();
 
   if (!result.success) {
-    console.error("[createCategory] D1 insert failed, meta:", JSON.stringify(result.meta));
+    console.error(
+      "[createCategory] D1 insert failed, meta:",
+      JSON.stringify(result.meta),
+    );
     throw new Error(
       `D1 insert failed (success=false, meta=${JSON.stringify(result.meta)})`,
     );
@@ -210,10 +214,7 @@ export const createCategory = async (
   const category = await CategoryRepo.findCategoryById(context.db, insertId);
 
   if (!category) {
-    const byName = await CategoryRepo.findCategoryByName(
-      context.db,
-      data.name,
-    );
+    const byName = await CategoryRepo.findCategoryByName(context.db, data.name);
     if (byName) return ok(byName);
     throw new Error(
       `Category created (id=${insertId}) but could not be retrieved`,

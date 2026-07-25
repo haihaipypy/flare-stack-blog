@@ -2,6 +2,7 @@ import handler from "@tanstack/react-start/server-entry";
 import type { Context } from "hono";
 import { Hono } from "hono";
 import { proxy } from "hono/proxy";
+import categoriesRoute from "@/features/categories/api/hono/categories.list.route";
 import { exportDownloadRoute } from "@/features/import-export/api/hono/download.route";
 import { handleImageRequest } from "@/features/media/service/media.service";
 import postsDetailRoute from "@/features/posts/api/hono/posts.detail.route";
@@ -10,7 +11,6 @@ import postsRelatedRoute from "@/features/posts/api/hono/posts.related.route";
 import searchRoute from "@/features/search/api/hono/search.route";
 import siteDocumentsRoute from "@/features/site-documents/api/hono/site-documents.route";
 import tagsRoute from "@/features/tags/api/hono/tags.list.route";
-import categoriesRoute from "@/features/categories/api/hono/categories.list.route";
 import { serverEnv } from "@/lib/env/server.env";
 import { createRateLimiterIdentifier, getExecutionContext } from "./helper";
 import {

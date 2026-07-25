@@ -39,13 +39,15 @@ export const POSTS_KEYS = {
   revisionDetails: ["posts", "revision-detail"] as const,
 
   // Child keys (functions for specific queries)
-  list: (filters: {
-    tagName?: string;
-    categoryName?: string;
-  } = {}) => ["posts", "list", {
-    ...filters,
-    tagName: normalizePostTagName(filters.tagName),
-  }] as const,
+  list: (filters: { tagName?: string; categoryName?: string } = {}) =>
+    [
+      "posts",
+      "list",
+      {
+        ...filters,
+        tagName: normalizePostTagName(filters.tagName),
+      },
+    ] as const,
   detail: (idOrSlug: number | string) => ["posts", "detail", idOrSlug] as const,
   related: (slug: string, limit?: number) =>
     ["posts", "related", slug, limit] as const,

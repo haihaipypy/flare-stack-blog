@@ -6,14 +6,14 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import theme from "@theme";
 import { useMemo } from "react";
 import { z } from "zod";
+import { categoriesQueryOptions } from "@/features/categories/queries";
 import { siteConfigQuery, siteDomainQuery } from "@/features/config/queries";
 import { postsInfiniteQueryOptions } from "@/features/posts/queries";
 import { PostTagNameSchema } from "@/features/posts/schema/posts.schema";
-import { categoriesQueryOptions } from "@/features/categories/queries";
+import { getNextPostTagFilter } from "@/features/posts/utils/post-tag-filter";
 import { tagsQueryOptions } from "@/features/tags/queries";
 import { buildCanonicalUrl, canonicalLink } from "@/lib/seo";
 import { m } from "@/paraglide/messages";
-import { getNextPostTagFilter } from "@/features/posts/utils/post-tag-filter";
 
 const { postsPerPage } = theme.config.posts;
 

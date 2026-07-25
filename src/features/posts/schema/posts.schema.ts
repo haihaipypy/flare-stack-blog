@@ -4,9 +4,9 @@ import {
   createUpdateSchema,
 } from "drizzle-zod";
 import { z } from "zod";
-import { TagSelectSchema } from "@/features/tags/tags.schema";
 import { CategorySelectSchema } from "@/features/categories/categories.schema";
-import type { Post, PostStatus, Tag, Category } from "@/lib/db/schema";
+import { TagSelectSchema } from "@/features/tags/tags.schema";
+import type { Category, Post, PostStatus, Tag } from "@/lib/db/schema";
 import { POST_STATUSES, PostsTable } from "@/lib/db/schema";
 import { NullableJsonContentSchema } from "./json-content.schema";
 
@@ -155,9 +155,7 @@ export const POSTS_CACHE_KEYS = {
       version,
       limit,
       cursor,
-      ...(tagName === undefined
-        ? ["all"]
-        : ["tag", tagName]),
+      ...(tagName === undefined ? ["all"] : ["tag", tagName]),
       categoryName ?? "all",
     ] as const,
   detail: (version: string, slug: string) => [version, "post", slug] as const,
