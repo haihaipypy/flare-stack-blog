@@ -133,9 +133,6 @@ mark {
 @layer base {
   body {
     @apply bg-background text-foreground overflow-x-hidden font-sans antialiased;
-    transition:
-      background-color 0.5s ease-in-out,
-      color 0.5s ease-in-out;
     line-height: 1.6;
   }
 

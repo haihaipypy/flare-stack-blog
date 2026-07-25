@@ -1,11 +1,11 @@
-import { Link, useRouteContext } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { Link, useRouteContext } from "@tanstack/react-router";
 import { ChevronDown, Home, Menu, Search, UserIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ThemeToggle } from "@/components/common/theme-toggle";
 import { Skeleton } from "@/components/ui/skeleton";
-import type { NavOption, UserInfo } from "@/features/theme/contract/layouts";
 import { categoriesQueryOptions } from "@/features/categories/queries";
+import type { NavOption, UserInfo } from "@/features/theme/contract/layouts";
 import { m } from "@/paraglide/messages";
 import { LanguageSwitcher } from "./language-switcher";
 
@@ -62,11 +62,7 @@ export function Navbar({
           : "translate-y-0 opacity-100"
       }`}
     >
-      <div
-        id="fuwari-navbar"
-        className="fuwari-onload-animation"
-        style={{ animationDelay: "0ms" }}
-      >
+      <div id="fuwari-navbar">
         <div className="fuwari-card-base overflow-visible! rounded-t-none! mx-auto flex items-center justify-between px-4 h-18 max-w-(--fuwari-page-width)">
           <Link
             to="/"

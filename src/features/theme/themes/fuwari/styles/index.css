@@ -76,12 +76,20 @@
 
   /* Homepage: make cards 80% opaque so the full-screen banner shows through */
   .is-home .fuwari-card-base {
-    background-color: color-mix(in srgb, var(--fuwari-card-bg) 80%, transparent);
+    background-color: color-mix(
+      in srgb,
+      var(--fuwari-card-bg) 80%,
+      transparent
+    );
   }
 
   /* Homepage: footer box also gets 80% opaque background for readability */
   .is-home .fuwari-footer {
-    background-color: color-mix(in srgb, var(--fuwari-card-bg) 80%, transparent);
+    background-color: color-mix(
+      in srgb,
+      var(--fuwari-card-bg) 80%,
+      transparent
+    );
   }
 
   .fuwari-btn-regular {
@@ -262,17 +270,14 @@
 /* Fuwari onload / entrance animations */
 @keyframes fuwari-fade-in-up {
   0% {
-    transform: translateY(2rem);
-    opacity: 0;
+    transform: translateY(1rem);
   }
   100% {
     transform: translateY(0);
-    opacity: 1;
   }
 }
 
 .fuwari-onload-animation {
-  opacity: 0;
   animation: 300ms fuwari-fade-in-up ease-out forwards;
 }
 
