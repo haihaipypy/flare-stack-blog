@@ -18,6 +18,7 @@ import type {
   UpdatePostInput,
 } from "@/features/posts/schema/posts.schema";
 import {
+  normalizePostTagName,
   POSTS_CACHE_KEYS,
   PostItemSchema,
   PostListResponseSchema,
@@ -47,10 +48,10 @@ function stripPublicContentJson<T extends { publicContentJson?: unknown }>(
 export async function getPinnedPosts(
   context: DbContext & { executionCtx: ExecutionContext },
 ) {
-  const version = await CacheService.getVersion(context, "posts:list");
-  return CacheService.get(
+  return CacheService.getVersioned(
     context,
-    POSTS_CACHE_KEYS.pinned(version),
+    "posts:list",
+    POSTS_CACHE_KEYS.pinned,
     PostItemSchema.array(),
     () => PostRepo.findPinnedPosts(context.db),
     { ttl: "7d" },
@@ -61,28 +62,28 @@ export async function getPostsCursor(
   context: DbContext & { executionCtx: ExecutionContext },
   data: GetPostsCursorInput,
 ) {
+  const tagName = normalizePostTagName(data.tagName);
   const fetcher = async () =>
     await PostRepo.getPostsCursor(context.db, {
       cursor: data.cursor,
       limit: data.limit,
       publicOnly: true,
-      tagName: data.tagName,
+      tagName,
       categoryName: data.categoryName,
       excludePinned: data.excludePinned,
     });
 
-  const version = await CacheService.getVersion(context, "posts:list");
-  const cacheKey = POSTS_CACHE_KEYS.list(
-    version,
-    data.limit ?? 10,
-    data.cursor ?? 0,
-    data.tagName ?? "all",
-    data.categoryName ?? "all",
-  );
-
-  return await CacheService.get(
+  return await CacheService.getVersioned(
     context,
-    cacheKey,
+    "posts:list",
+    (version) =>
+      POSTS_CACHE_KEYS.list(
+        version,
+        data.limit ?? 10,
+        data.cursor ?? 0,
+        tagName,
+        data.categoryName,
+      ),
     PostListResponseSchema,
     fetcher,
     {
@@ -122,11 +123,14 @@ export async function findPostBySlug(
     };
   };
 
-  const version = await CacheService.getVersion(context, "posts:detail");
-  const cacheKey = POSTS_CACHE_KEYS.detail(version, data.slug);
-  return await CacheService.get(context, cacheKey, PostWithTocSchema, fetcher, {
-    ttl: "7d",
-  });
+  return await CacheService.getVersioned(
+    context,
+    "posts:detail",
+    (version) => POSTS_CACHE_KEYS.detail(version, data.slug),
+    PostWithTocSchema,
+    fetcher,
+    { ttl: "7d" },
+  );
 }
 
 export async function getRelatedPosts(

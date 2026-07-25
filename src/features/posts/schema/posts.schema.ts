@@ -51,10 +51,21 @@ export const PostWithTocSchema = PostSelectSchema.extend({
   ),
 }).nullable();
 
+export function normalizePostTagName(
+  tagName: string | undefined,
+): string | undefined {
+  return tagName === "" ? undefined : tagName;
+}
+
+export const PostTagNameSchema = z
+  .string()
+  .transform(normalizePostTagName)
+  .optional();
+
 export const GetPostsCursorInputSchema = z.object({
   cursor: z.number().optional(),
   limit: z.number().optional(),
-  tagName: z.string().optional(),
+  tagName: PostTagNameSchema,
   categoryName: z.string().optional(),
   excludePinned: z.boolean().optional(),
 });
@@ -135,10 +146,20 @@ export const POSTS_CACHE_KEYS = {
     version: string,
     limit: number,
     cursor: number,
-    tagName: string,
-    categoryName: string,
+    tagName?: string,
+    categoryName?: string,
   ) =>
-    ["posts", "list", version, limit, cursor, tagName, categoryName] as const,
+    [
+      "posts",
+      "list",
+      version,
+      limit,
+      cursor,
+      ...(tagName === undefined
+        ? ["all"]
+        : ["tag", tagName]),
+      categoryName ?? "all",
+    ] as const,
   detail: (version: string, slug: string) => [version, "post", slug] as const,
   related: (slug: string, limit?: number) =>
     ["posts", "related-ids", slug, limit] as const,

@@ -8,16 +8,18 @@ import { useMemo } from "react";
 import { z } from "zod";
 import { siteConfigQuery, siteDomainQuery } from "@/features/config/queries";
 import { postsInfiniteQueryOptions } from "@/features/posts/queries";
+import { PostTagNameSchema } from "@/features/posts/schema/posts.schema";
 import { categoriesQueryOptions } from "@/features/categories/queries";
 import { tagsQueryOptions } from "@/features/tags/queries";
 import { buildCanonicalUrl, canonicalLink } from "@/lib/seo";
 import { m } from "@/paraglide/messages";
+import { getNextPostTagFilter } from "@/features/posts/utils/post-tag-filter";
 
 const { postsPerPage } = theme.config.posts;
 
 export const Route = createFileRoute("/_public/posts")({
   validateSearch: z.object({
-    tagName: z.string().optional(),
+    tagName: PostTagNameSchema,
     categoryName: z.string().optional(),
   }),
   component: RouteComponent,
@@ -84,10 +86,10 @@ function RouteComponent() {
     return data.pages.flatMap((page) => page.items);
   }, [data]);
 
-  const handleTagClick = (clickedTag: string) => {
+  const handleTagClick = (clickedTag?: string) => {
     navigate({
       search: {
-        tagName: clickedTag === tagName ? undefined : clickedTag,
+        ...getNextPostTagFilter(tagName, clickedTag),
         categoryName,
       },
       replace: true,

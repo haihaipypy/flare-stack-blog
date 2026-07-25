@@ -8,7 +8,7 @@ export interface PostsPageProps {
   categories: Array<Omit<CategoryWithCount, "createdAt">>;
   selectedTag?: string;
   selectedCategory?: string;
-  onTagClick: (tag: string) => void;
+  onTagClick: (tag?: string) => void;
   onCategoryClick: (category: string) => void;
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
