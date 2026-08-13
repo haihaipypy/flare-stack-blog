@@ -11,10 +11,11 @@ const outputPath = resolve(
 );
 
 export function normalizeHostname(input: string): string {
-  if (input.includes("://")) {
-    return new URL(input).hostname;
+  const trimmed = input.trim();
+  if (trimmed.includes("://")) {
+    return new URL(trimmed).hostname;
   }
-  return input.replace(/(?::\d+)?\/*$/, "");
+  return trimmed.replace(/(?::\d+)?\/*$/, "");
 }
 
 export function inferZoneName(hostname: string): string {
