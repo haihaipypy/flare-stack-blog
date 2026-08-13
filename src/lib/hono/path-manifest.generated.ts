@@ -19,6 +19,7 @@ export const ROUTE_REGEXPS: Array<RegExp> = [
   /^\/submit-friend-link\/?$/,
   /^\/oauth\/consent\/?$/,
   /^\/post\/[^/]+\/?$/,
+  /^\/admin\/categories\/?$/,
   /^\/admin\/comments\/?$/,
   /^\/admin\/friend-links\/?$/,
   /^\/admin\/media\/?$/,
