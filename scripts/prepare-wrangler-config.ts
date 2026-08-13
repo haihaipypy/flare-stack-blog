@@ -51,16 +51,18 @@ export function buildRoutesBlock(
   hostname: string,
   mode: "custom_domain" | "routes",
   zoneNameOverride?: string,
+  extraHostnames: string[] = [],
 ): string {
-  const route =
+  const routes = [hostname, ...extraHostnames].map((h) =>
     mode === "routes"
       ? {
-          pattern: `${hostname}/*`,
-          zone_name: zoneNameOverride?.trim() || inferZoneName(hostname),
+          pattern: `${h}/*`,
+          zone_name: zoneNameOverride?.trim() || inferZoneName(h),
         }
-      : { pattern: hostname, custom_domain: true };
+      : { pattern: h, custom_domain: true },
+  );
 
-  const inner = JSON.stringify([route], null, 2).replace(/^/gm, "  ").trim();
+  const inner = JSON.stringify(routes, null, 2).replace(/^/gm, "  ").trim();
   return `"routes": ${inner},`;
 }
 
@@ -68,6 +70,7 @@ type PrepareWranglerConfigOptions = {
   bucketName: string;
   d1DatabaseId: string;
   domain: string;
+  extraDomains: string[];
   kvNamespaceId: string;
   mode: "custom_domain" | "routes";
   template: string;
@@ -78,6 +81,7 @@ export function prepareWranglerConfigContent({
   bucketName,
   d1DatabaseId,
   domain,
+  extraDomains,
   kvNamespaceId,
   mode,
   template,
@@ -98,12 +102,16 @@ export function prepareWranglerConfigContent({
 
   return content.replace(
     /"routes":\s*\[[\s\S]*?\],/,
-    buildRoutesBlock(domain, mode, zoneNameOverride),
+    buildRoutesBlock(domain, mode, zoneNameOverride, extraDomains),
   );
 }
 
 export function prepareWranglerConfig(env: EnvMap): "custom_domain" | "routes" {
   const domain = normalizeHostname(requireEnv(env, "DOMAIN"));
+  const extraDomains = (env.EXTRA_DOMAINS ?? "")
+    .split(",")
+    .map((d) => normalizeHostname(d))
+    .filter(Boolean);
   const mode = resolveDeployDomainMode(env);
   const template = readFileSync(examplePath, "utf8");
 
@@ -111,6 +119,7 @@ export function prepareWranglerConfig(env: EnvMap): "custom_domain" | "routes" {
     bucketName: requireEnv(env, "BUCKET_NAME"),
     d1DatabaseId: requireEnv(env, "D1_DATABASE_ID"),
     domain,
+    extraDomains,
     kvNamespaceId: requireEnv(env, "KV_NAMESPACE_ID"),
     mode,
     template,
