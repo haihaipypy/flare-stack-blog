@@ -24,6 +24,13 @@ export const Route = createFileRoute("/_public")({
       as: "image",
       href,
     })),
+    scripts: [
+      {
+        src: "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8679584685749710",
+        async: true,
+        crossOrigin: "anonymous",
+      },
+    ],
   }),
 });
 
