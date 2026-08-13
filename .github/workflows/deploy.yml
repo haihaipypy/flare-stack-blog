@@ -131,9 +131,18 @@ jobs:
       - name: Purge Cloudflare CDN Cache
         run: |
           PURGE_DOMAIN=${CDN_DOMAIN:-$DOMAIN}
-          echo "Purging CDN cache for $PURGE_DOMAIN"
-          curl -s -X POST "https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE_ID/purge_cache" \
-            -H "Authorization: Bearer $CLOUDFLARE_PURGE_API_TOKEN" \
-            -H "Content-Type: application/json" \
-            --data '{"prefixes":["'$PURGE_DOMAIN'"]}'
-          echo ""
+          # 同时 purge 主域名与 EXTRA_DOMAINS 中的每个域名
+          PURGE_LIST="$PURGE_DOMAIN"
+          if [ -n "$EXTRA_DOMAINS" ]; then
+            for d in $(echo "$EXTRA_DOMAINS" | tr ',' ' '); do
+              PURGE_LIST="$PURGE_LIST $d"
+            done
+          fi
+          for d in $PURGE_LIST; do
+            echo "Purging CDN cache for $d"
+            curl -s -X POST "https://api.cloudflare.com/client/v4/zones/$CLOUDFLARE_ZONE_ID/purge_cache" \
+              -H "Authorization: Bearer $CLOUDFLARE_PURGE_API_TOKEN" \
+              -H "Content-Type: application/json" \
+              --data '{"prefixes":["'$d'"]}'
+            echo ""
+          done
