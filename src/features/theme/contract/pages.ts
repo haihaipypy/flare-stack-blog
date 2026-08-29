@@ -17,4 +17,5 @@ export type * from "./pages/profile";
 export type * from "./pages/register";
 export type * from "./pages/reset-password";
 export type * from "./pages/search";
+export type * from "./pages/tools";
 export type * from "./pages/verify-email";

@@ -17,6 +17,7 @@ import { PostsPage, PostsPageSkeleton } from "./pages/posts";
 import { SearchPage } from "./pages/search";
 import { SubmitFriendLinkPage } from "./pages/submit-friend-link";
 import { ProfilePage } from "./pages/user/profile";
+import { ToolsPage, ToolsPageSkeleton } from "./pages/tools";
 import { getFuwariThemeStyle } from "./theme-style";
 
 /**
@@ -37,6 +38,8 @@ export default {
   UserLayout,
   FriendLinksPage,
   FriendLinksPageSkeleton,
+  ToolsPage,
+  ToolsPageSkeleton,
   SearchPage,
   SubmitFriendLinkPage,
   LoginPage,

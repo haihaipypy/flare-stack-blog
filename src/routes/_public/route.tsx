@@ -53,6 +53,11 @@ function PublicLayout() {
       to: "/friend-links" as const,
       id: "friend-links",
     },
+    {
+      label: m.nav_tools(),
+      to: "/tools" as const,
+      id: "tools",
+    },
   ];
 
   const logout = async () => {

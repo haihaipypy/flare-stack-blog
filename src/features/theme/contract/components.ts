@@ -17,6 +17,7 @@ import type {
   ResetPasswordPageProps,
   SearchPageProps,
   SubmitFriendLinkPageProps,
+  ToolsPageProps,
   VerifyEmailPageProps,
 } from "./pages";
 
@@ -54,6 +55,11 @@ export interface ThemeComponents {
   FriendLinksPage: React.ComponentType<FriendLinksPageProps>;
   /** 友链列表页骨架屏 */
   FriendLinksPageSkeleton: React.ComponentType;
+
+  /** 工具页组件 */
+  ToolsPage: React.ComponentType<ToolsPageProps>;
+  /** 工具页骨架屏 */
+  ToolsPageSkeleton: React.ComponentType;
 
   /** 搜索页组件 */
   SearchPage: React.ComponentType<SearchPageProps>;
