@@ -23,6 +23,7 @@ export function PublicLayout({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
   const isHomePage = location.pathname === "/";
+  const isToolsPage = location.pathname === "/tools";
   const bannerHeightVh = isHomePage ? BANNER_HEIGHT_HOME : BANNER_HEIGHT_PAGE;
 
   return (
@@ -84,20 +85,24 @@ export function PublicLayout({
         }}
       >
         <div
-          className="relative mx-auto px-0 md:px-4 pb-8 grid grid-cols-1 lg:grid-cols-[17.5rem_1fr] gap-4"
+          className={`relative mx-auto px-0 md:px-4 pb-8 grid gap-4 ${
+            isToolsPage
+              ? "grid-cols-1"
+              : "grid-cols-1 lg:grid-cols-[17.5rem_1fr]"
+          }`}
           style={{ maxWidth: "var(--fuwari-page-width)" }}
         >
           {/* Sidebar Column */}
-          <Sidebar className="order-2 lg:order-1" />
+          {!isToolsPage && <Sidebar className="order-2 lg:order-1" />}
 
           {/* Main Content Column */}
-          <main className="order-1 lg:order-2 flex flex-col gap-4 min-w-0">
+          <main className={`${isToolsPage ? "" : "order-1 lg:order-2"} flex flex-col gap-4 min-w-0`}>
             {children}
           </main>
 
           {/* Footer Column (Desktop: below main, Mobile: below sidebar) */}
           <div
-            className="order-3 lg:col-start-2 fuwari-onload-animation mt-auto"
+            className={`${isToolsPage ? "" : "order-3 lg:col-start-2"} fuwari-onload-animation mt-auto`}
             style={{ animationDelay: "250ms" }}
           >
             <Footer navOptions={navOptions} />
