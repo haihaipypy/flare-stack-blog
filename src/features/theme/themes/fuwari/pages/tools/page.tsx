@@ -2,17 +2,7 @@ import type { ToolsPageProps } from "@/features/theme/contract/pages";
 
 export function ToolsPage({ title, description, content }: ToolsPageProps & { title: string; description: string; content: string }) {
   return (
-    <div className="w-full max-w-3xl mx-auto pb-20 px-6 md:px-0">
-      <header className="py-12 md:py-20 space-y-6">
-        <h1 className="text-4xl md:text-5xl font-serif font-medium tracking-tight text-foreground">
-          {title}
-        </h1>
-        {description && (
-          <p className="max-w-xl text-base md:text-lg font-light text-muted-foreground leading-relaxed">
-            {description}
-          </p>
-        )}
-      </header>
+    <div className="w-full max-w-6xl mx-auto pb-20 px-6 md:px-4">
       <div className="min-h-[400px]">
         {content && content.trim() !== "" ? (
           <div className="p-8 prose prose-sm max-w-none">
