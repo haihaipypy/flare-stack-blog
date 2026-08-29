@@ -1603,5 +1603,14 @@
   "category_selector_empty": "暂无分类 (输入以创建)",
   "nav_tools": "工具",
   "tools_page_title": "工具",
-  "tools_page_desc": "工具页面，内容可在后台编辑"
+  "tools_page_desc": "工具页面，内容可在后台编辑",
+  "settings_site_field_tools_page_title": "工具页面标题",
+  "settings_site_field_tools_page_title_hint": "工具页面的标题，显示在浏览器标签栏",
+  "settings_site_field_tools_page_title_ph": "请输入工具页面标题",
+  "settings_site_field_tools_page_desc": "工具页面描述",
+  "settings_site_field_tools_page_desc_hint": "工具页面的简短描述，用于SEO和页面头部",
+  "settings_site_field_tools_page_desc_ph": "请输入工具页面描述",
+  "settings_site_field_tools_page_content": "工具页面内容",
+  "settings_site_field_tools_page_content_hint": "工具页面的主要内容，支持富文本编辑",
+  "settings_site_field_tools_page_content_ph": "请输入工具页面内容"
 }

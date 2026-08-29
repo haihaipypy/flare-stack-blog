@@ -19,6 +19,7 @@ import { Route as OauthConsentRouteImport } from './routes/oauth/consent'
 import { Route as UserSubmitFriendLinkRouteImport } from './routes/_user/submit-friend-link'
 import { Route as UserProfileRouteImport } from './routes/_user/profile'
 import { Route as PublicUnsubscribeRouteImport } from './routes/_public/unsubscribe'
+import { Route as PublicToolsRouteImport } from './routes/_public/tools'
 import { Route as PublicSearchRouteImport } from './routes/_public/search'
 import { Route as PublicPostsRouteImport } from './routes/_public/posts'
 import { Route as PublicFriendLinksRouteImport } from './routes/_public/friend-links'
@@ -83,6 +84,11 @@ const UserProfileRoute = UserProfileRouteImport.update({
 const PublicUnsubscribeRoute = PublicUnsubscribeRouteImport.update({
   id: '/unsubscribe',
   path: '/unsubscribe',
+  getParentRoute: () => PublicRouteRoute,
+} as any)
+const PublicToolsRoute = PublicToolsRouteImport.update({
+  id: '/tools',
+  path: '/tools',
   getParentRoute: () => PublicRouteRoute,
 } as any)
 const PublicSearchRoute = PublicSearchRouteImport.update({
@@ -188,6 +194,7 @@ export interface FileRoutesByFullPath {
   '/friend-links': typeof PublicFriendLinksRoute
   '/posts': typeof PublicPostsRoute
   '/search': typeof PublicSearchRoute
+  '/tools': typeof PublicToolsRoute
   '/unsubscribe': typeof PublicUnsubscribeRoute
   '/profile': typeof UserProfileRoute
   '/submit-friend-link': typeof UserSubmitFriendLinkRoute
@@ -213,6 +220,7 @@ export interface FileRoutesByTo {
   '/friend-links': typeof PublicFriendLinksRoute
   '/posts': typeof PublicPostsRoute
   '/search': typeof PublicSearchRoute
+  '/tools': typeof PublicToolsRoute
   '/unsubscribe': typeof PublicUnsubscribeRoute
   '/profile': typeof UserProfileRoute
   '/submit-friend-link': typeof UserSubmitFriendLinkRoute
@@ -243,6 +251,7 @@ export interface FileRoutesById {
   '/_public/friend-links': typeof PublicFriendLinksRoute
   '/_public/posts': typeof PublicPostsRoute
   '/_public/search': typeof PublicSearchRoute
+  '/_public/tools': typeof PublicToolsRoute
   '/_public/unsubscribe': typeof PublicUnsubscribeRoute
   '/_user/profile': typeof UserProfileRoute
   '/_user/submit-friend-link': typeof UserSubmitFriendLinkRoute
@@ -273,6 +282,7 @@ export interface FileRouteTypes {
     | '/friend-links'
     | '/posts'
     | '/search'
+    | '/tools'
     | '/unsubscribe'
     | '/profile'
     | '/submit-friend-link'
@@ -298,6 +308,7 @@ export interface FileRouteTypes {
     | '/friend-links'
     | '/posts'
     | '/search'
+    | '/tools'
     | '/unsubscribe'
     | '/profile'
     | '/submit-friend-link'
@@ -327,6 +338,7 @@ export interface FileRouteTypes {
     | '/_public/friend-links'
     | '/_public/posts'
     | '/_public/search'
+    | '/_public/tools'
     | '/_public/unsubscribe'
     | '/_user/profile'
     | '/_user/submit-friend-link'
@@ -422,6 +434,13 @@ declare module '@tanstack/react-router' {
       path: '/unsubscribe'
       fullPath: '/unsubscribe'
       preLoaderRoute: typeof PublicUnsubscribeRouteImport
+      parentRoute: typeof PublicRouteRoute
+    }
+    '/_public/tools': {
+      id: '/_public/tools'
+      path: '/tools'
+      fullPath: '/tools'
+      preLoaderRoute: typeof PublicToolsRouteImport
       parentRoute: typeof PublicRouteRoute
     }
     '/_public/search': {
@@ -577,6 +596,7 @@ interface PublicRouteRouteChildren {
   PublicFriendLinksRoute: typeof PublicFriendLinksRoute
   PublicPostsRoute: typeof PublicPostsRoute
   PublicSearchRoute: typeof PublicSearchRoute
+  PublicToolsRoute: typeof PublicToolsRoute
   PublicUnsubscribeRoute: typeof PublicUnsubscribeRoute
   PublicIndexRoute: typeof PublicIndexRoute
   PublicPostSlugRoute: typeof PublicPostSlugRoute
@@ -586,6 +606,7 @@ const PublicRouteRouteChildren: PublicRouteRouteChildren = {
   PublicFriendLinksRoute: PublicFriendLinksRoute,
   PublicPostsRoute: PublicPostsRoute,
   PublicSearchRoute: PublicSearchRoute,
+  PublicToolsRoute: PublicToolsRoute,
   PublicUnsubscribeRoute: PublicUnsubscribeRoute,
   PublicIndexRoute: PublicIndexRoute,
   PublicPostSlugRoute: PublicPostSlugRoute,

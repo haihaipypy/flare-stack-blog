@@ -1611,5 +1611,14 @@
   "category_selector_empty": "No categories yet (type to create)",
   "nav_tools": "Tools",
   "tools_page_title": "Tools",
-  "tools_page_desc": "Tools page, content editable from backend"
+  "tools_page_desc": "Tools page, content editable from backend",
+  "settings_site_field_tools_page_title": "Tools Page Title",
+  "settings_site_field_tools_page_title_hint": "The title of the tools page, displayed in browser tab",
+  "settings_site_field_tools_page_title_ph": "Enter tools page title",
+  "settings_site_field_tools_page_desc": "Tools Page Description",
+  "settings_site_field_tools_page_desc_hint": "A brief description of the tools page for SEO and page header",
+  "settings_site_field_tools_page_desc_ph": "Enter tools page description",
+  "settings_site_field_tools_page_content": "Tools Page Content",
+  "settings_site_field_tools_page_content_hint": "The main content of the tools page, supports rich text editing",
+  "settings_site_field_tools_page_content_ph": "Enter tools page content"
 }

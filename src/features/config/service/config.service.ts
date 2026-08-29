@@ -90,6 +90,8 @@ export function resolveSiteConfig(
     title: config?.site?.title ?? blogConfig.title,
     author: config?.site?.author ?? blogConfig.author,
     description: config?.site?.description ?? blogConfig.description,
+    tools_page_title: config?.site?.tools_page_title ?? blogConfig.tools_page_title,
+    tools_page_description: config?.site?.tools_page_description ?? blogConfig.tools_page_description,
     social: migrateSocial(config?.site?.social),
     icons: {
       faviconSvg:

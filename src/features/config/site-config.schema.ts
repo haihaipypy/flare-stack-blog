@@ -286,6 +286,9 @@ export const FullSiteConfigSchema = z.object({
   title: createSiteTextSchema(120),
   author: createSiteTextSchema(80),
   description: createSiteTextSchema(300),
+  tools_page_title: createSiteTextSchema(120),
+  tools_page_description: createSiteTextSchema(300),
+  tools_page_content: z.string(),
   social: z.array(SocialLinkSchema),
   icons: z.object({
     faviconSvg: createAssetPathSchema(),
@@ -306,6 +309,9 @@ export function createSiteConfigInputFormSchema(messages: Messages) {
     title: createSiteTextFormSchema(120, messages).optional(),
     author: createSiteTextFormSchema(80, messages).optional(),
     description: createSiteTextFormSchema(300, messages).optional(),
+    tools_page_title: createSiteTextFormSchema(120, messages).optional(),
+    tools_page_description: createSiteTextFormSchema(300, messages).optional(),
+    tools_page_content: z.string().optional(),
     social: z.array(SocialLinkSchema).optional(),
     icons: z
       .object({
@@ -331,6 +337,9 @@ export const SiteConfigInputSchema = z.object({
   title: createSiteTextSchema(120).optional(),
   author: createSiteTextSchema(80).optional(),
   description: createSiteTextSchema(300).optional(),
+  tools_page_title: createSiteTextSchema(120).optional(),
+  tools_page_description: createSiteTextSchema(300).optional(),
+  tools_page_content: z.string().optional(),
   social: z.array(SocialLinkSchema).optional(),
   icons: z
     .object({
