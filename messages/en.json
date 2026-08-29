@@ -1620,5 +1620,13 @@
   "settings_site_field_tools_page_desc_ph": "Enter tools page description",
   "settings_site_field_tools_page_content": "Tools Page Content",
   "settings_site_field_tools_page_content_hint": "The main content of the tools page, supports rich text editing",
-  "settings_site_field_tools_page_content_ph": "Enter tools page content"
+  "settings_site_field_tools_page_content_ph": "Enter tools page content",
+  "admin_sidebar_tools": "Tools Page",
+  "admin_tools_page_title": "Tools Page",
+  "admin_tools_page_header_title": "Tools Page Management",
+  "admin_tools_page_header_desc": "Manage the title, description and content of the tools page",
+  "admin_tools_page_btn_save": "Save",
+  "admin_tools_page_btn_saving": "Saving...",
+  "admin_tools_page_save_success": "Tools page saved successfully",
+  "admin_tools_page_save_error": "Failed to save, please try again"
 }

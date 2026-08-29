@@ -3,6 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import {
   FileText,
   FolderTree,
+  Hammer,
   Image as ImageIcon,
   LayoutDashboard,
   Link2,
@@ -90,6 +91,12 @@ export function SideBar({
       path: "/admin/categories",
       icon: FolderTree,
       label: m.admin_sidebar_categories(),
+      exact: false,
+    },
+    {
+      path: "/admin/tools",
+      icon: Hammer,
+      label: m.admin_sidebar_tools(),
       exact: false,
     },
     {

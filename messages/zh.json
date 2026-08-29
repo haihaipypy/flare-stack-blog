@@ -1612,5 +1612,13 @@
   "settings_site_field_tools_page_desc_ph": "请输入工具页面描述",
   "settings_site_field_tools_page_content": "工具页面内容",
   "settings_site_field_tools_page_content_hint": "工具页面的主要内容，支持富文本编辑",
-  "settings_site_field_tools_page_content_ph": "请输入工具页面内容"
+  "settings_site_field_tools_page_content_ph": "请输入工具页面内容",
+  "admin_sidebar_tools": "工具页管理",
+  "admin_tools_page_title": "工具页管理",
+  "admin_tools_page_header_title": "工具页管理",
+  "admin_tools_page_header_desc": "管理工具页面的标题、描述和内容",
+  "admin_tools_page_btn_save": "保存",
+  "admin_tools_page_btn_saving": "保存中...",
+  "admin_tools_page_save_success": "工具页内容已保存",
+  "admin_tools_page_save_error": "保存失败，请重试"
 }
