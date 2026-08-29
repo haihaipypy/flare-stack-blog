@@ -86,56 +86,72 @@ export function resolveSiteConfig(
 ): SiteConfig {
   const configDefaultBackground = config?.site?.theme?.default?.background;
 
-  return FullSiteConfigSchema.parse({
-    title: config?.site?.title ?? blogConfig.title,
-    author: config?.site?.author ?? blogConfig.author,
-    description: config?.site?.description ?? blogConfig.description,
-    tools_page_title: config?.site?.tools_page_title ?? blogConfig.tools_page_title,
-    tools_page_description: config?.site?.tools_page_description ?? blogConfig.tools_page_description,
-    social: migrateSocial(config?.site?.social),
-    icons: {
-      faviconSvg:
-        config?.site?.icons?.faviconSvg || blogConfig.icons.faviconSvg,
-      faviconIco:
-        config?.site?.icons?.faviconIco || blogConfig.icons.faviconIco,
-      favicon96: config?.site?.icons?.favicon96 || blogConfig.icons.favicon96,
-      appleTouchIcon:
-        config?.site?.icons?.appleTouchIcon || blogConfig.icons.appleTouchIcon,
-      webApp192: config?.site?.icons?.webApp192 || blogConfig.icons.webApp192,
-      webApp512: config?.site?.icons?.webApp512 || blogConfig.icons.webApp512,
-    },
-    theme: {
-      default: {
-        navBarName:
-          config?.site?.theme?.default?.navBarName ??
-          blogConfig.theme.default.navBarName,
-        background: configDefaultBackground
-          ? {
-              homeImage: configDefaultBackground.homeImage ?? "",
-              globalImage: configDefaultBackground.globalImage ?? "",
-              light: {
-                opacity: configDefaultBackground.light?.opacity ?? 0.15,
-              },
-              dark: {
-                opacity: configDefaultBackground.dark?.opacity ?? 0.1,
-              },
-              backdropBlur: configDefaultBackground.backdropBlur ?? 8,
-              transitionDuration:
-                configDefaultBackground.transitionDuration ?? 600,
-            }
-          : undefined,
+  try {
+    return FullSiteConfigSchema.parse({
+      title: config?.site?.title ?? blogConfig.title,
+      author: config?.site?.author ?? blogConfig.author,
+      description: config?.site?.description ?? blogConfig.description,
+      tools_page_title: config?.site?.tools_page_title ?? blogConfig.tools_page_title,
+      tools_page_description: config?.site?.tools_page_description ?? blogConfig.tools_page_description,
+      tools_page_content: config?.site?.tools_page_content ?? blogConfig.tools_page_content,
+      social: migrateSocial(config?.site?.social),
+      icons: {
+        faviconSvg:
+          config?.site?.icons?.faviconSvg || blogConfig.icons.faviconSvg,
+        faviconIco:
+          config?.site?.icons?.faviconIco || blogConfig.icons.faviconIco,
+        favicon96: config?.site?.icons?.favicon96 || blogConfig.icons.favicon96,
+        appleTouchIcon:
+          config?.site?.icons?.appleTouchIcon || blogConfig.icons.appleTouchIcon,
+        webApp192: config?.site?.icons?.webApp192 || blogConfig.icons.webApp192,
+        webApp512: config?.site?.icons?.webApp512 || blogConfig.icons.webApp512,
       },
-      fuwari: {
-        homeBg:
-          config?.site?.theme?.fuwari?.homeBg ?? blogConfig.theme.fuwari.homeBg,
-        avatar:
-          config?.site?.theme?.fuwari?.avatar ?? blogConfig.theme.fuwari.avatar,
-        primaryHue:
-          config?.site?.theme?.fuwari?.primaryHue ??
-          blogConfig.theme.fuwari.primaryHue,
+      theme: {
+        default: {
+          navBarName:
+            config?.site?.theme?.default?.navBarName ??
+            blogConfig.theme.default.navBarName,
+          background: configDefaultBackground
+            ? {
+                homeImage: configDefaultBackground.homeImage ?? "",
+                globalImage: configDefaultBackground.globalImage ?? "",
+                light: {
+                  opacity: configDefaultBackground.light?.opacity ?? 0.15,
+                },
+                dark: {
+                  opacity: configDefaultBackground.dark?.opacity ?? 0.1,
+                },
+                backdropBlur: configDefaultBackground.backdropBlur ?? 8,
+                transitionDuration:
+                  configDefaultBackground.transitionDuration ?? 600,
+              }
+            : undefined,
+        },
+        fuwari: {
+          homeBg:
+            config?.site?.theme?.fuwari?.homeBg ?? blogConfig.theme.fuwari.homeBg,
+          avatar:
+            config?.site?.theme?.fuwari?.avatar ?? blogConfig.theme.fuwari.avatar,
+          primaryHue:
+            config?.site?.theme?.fuwari?.primaryHue ??
+            blogConfig.theme.fuwari.primaryHue,
+        },
       },
-    },
-  });
+    });
+  } catch (error) {
+    console.error("Failed to resolve site config:", error);
+    return FullSiteConfigSchema.parse({
+      title: blogConfig.title,
+      author: blogConfig.author,
+      description: blogConfig.description,
+      tools_page_title: blogConfig.tools_page_title,
+      tools_page_description: blogConfig.tools_page_description,
+      tools_page_content: blogConfig.tools_page_content,
+      social: migrateSocial(blogConfig.social),
+      icons: blogConfig.icons,
+      theme: blogConfig.theme,
+    });
+  }
 }
 
 function hasSiteConfigChanged(
