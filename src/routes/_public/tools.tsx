@@ -5,7 +5,7 @@ import { m } from "@/paraglide/messages";
 import { siteConfigQuery } from "@/features/config/queries";
 
 export const Route = createFileRoute("/_public/tools")({
-  component: ToolsPage,
+  component: RouteComponent,
   loader: async ({ context }) => {
     const siteConfig = await context.queryClient.ensureQueryData(siteConfigQuery);
     return {
@@ -23,6 +23,13 @@ export const Route = createFileRoute("/_public/tools")({
   pendingComponent: theme.ToolsPageSkeleton,
 });
 
-function ToolsPage({ title, description, content }: { title: string; description: string; content: string }) {
-  return <theme.ToolsPage title={title} description={description} content={content} />;
+function RouteComponent() {
+  const { data: siteConfig } = useSuspenseQuery(siteConfigQuery);
+  return (
+    <theme.ToolsPage
+      title={siteConfig.tools_page_title}
+      description={siteConfig.tools_page_description}
+      content={siteConfig.tools_page_content}
+    />
+  );
 }
