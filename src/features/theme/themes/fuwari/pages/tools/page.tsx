@@ -1,4 +1,3 @@
-import { m } from "@/paraglide/messages";
 import type { ToolsPageProps } from "@/features/theme/contract/pages";
 
 export function ToolsPage({ title, description, content }: ToolsPageProps & { title: string; description: string; content: string }) {
@@ -15,13 +14,9 @@ export function ToolsPage({ title, description, content }: ToolsPageProps & { ti
         )}
       </header>
       <div className="min-h-[400px]">
-        {content.trim() !== "" ? (
+        {content && content.trim() !== "" ? (
           <div className="p-8 prose prose-sm max-w-none">
-            <div
-              dangerouslySetInnerHTML={{
-                __html: content
-              }}
-            />
+            <div dangerouslySetInnerHTML={{ __html: content }} />
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center py-20">
