@@ -87,6 +87,8 @@ export function resolveSiteConfig(
   const configDefaultBackground = config?.site?.theme?.default?.background;
 
   try {
+    console.log("resolveSiteConfig input config.site:", JSON.stringify(config?.site, null, 2));
+    console.log("resolveSiteConfig blogConfig tools fields:", JSON.stringify({ title: blogConfig.tools_page_title, description: blogConfig.tools_page_description, content: blogConfig.tools_page_content }, null, 2));
     return FullSiteConfigSchema.parse({
       title: config?.site?.title ?? blogConfig.title,
       author: config?.site?.author ?? blogConfig.author,
@@ -204,6 +206,8 @@ export async function updateSystemConfig(
 ) {
   const currentConfig = await ConfigRepo.getSystemConfig(context.db);
   const nextConfig = resolveSystemConfig(data);
+  console.log("updateSystemConfig input data:", JSON.stringify(data, null, 2));
+  console.log("updateSystemConfig nextConfig:", JSON.stringify(nextConfig, null, 2));
 
   await ConfigRepo.upsertSystemConfig(context.db, nextConfig);
   await CacheService.deleteKey(context, CONFIG_CACHE_KEYS.system);
