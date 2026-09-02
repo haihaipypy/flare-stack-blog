@@ -22,3 +22,6 @@ docs/superpowers/
 *.tsbuildinfo
 .fallow
 .workbuddy/
+# agent local state
+.omo/
+.opencode-lark/
