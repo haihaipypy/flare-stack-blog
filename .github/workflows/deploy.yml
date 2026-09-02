@@ -85,6 +85,7 @@ jobs:
           echo "CDN_DOMAIN=${{ secrets.CDN_DOMAIN }}" >> $GITHUB_ENV
           echo "UMAMI_SRC=${{ secrets.UMAMI_SRC }}" >> $GITHUB_ENV
           echo "VITE_UMAMI_WEBSITE_ID=${{ vars.VITE_UMAMI_WEBSITE_ID }}" >> $GITHUB_ENV
+          echo "VITE_GOOGLE_ANALYTICS_ID=${{ vars.VITE_GOOGLE_ANALYTICS_ID }}" >> $GITHUB_ENV
           echo "PAGEVIEW_SALT=${{ secrets.PAGEVIEW_SALT }}" >> $GITHUB_ENV
           echo "VITE_TURNSTILE_SITE_KEY=${{ vars.VITE_TURNSTILE_SITE_KEY }}" >> $GITHUB_ENV
           echo "THEME=${{ vars.THEME }}" >> $GITHUB_ENV
@@ -114,6 +115,7 @@ jobs:
             "EXTRA_DOMAINS": "$EXTRA_DOMAINS",
             "CDN_DOMAIN": "$CDN_DOMAIN",
             "VITE_UMAMI_WEBSITE_ID": "$VITE_UMAMI_WEBSITE_ID",
+            "VITE_GOOGLE_ANALYTICS_ID": "$VITE_GOOGLE_ANALYTICS_ID",
             "UMAMI_SRC": "$UMAMI_SRC",
             "PAGEVIEW_SALT": "$PAGEVIEW_SALT",
             "TURNSTILE_SECRET_KEY": "$TURNSTILE_SECRET_KEY",

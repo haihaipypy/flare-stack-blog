@@ -91,9 +91,13 @@ export function resolveSiteConfig(
       title: config?.site?.title ?? blogConfig.title,
       author: config?.site?.author ?? blogConfig.author,
       description: config?.site?.description ?? blogConfig.description,
-      tools_page_title: config?.site?.tools_page_title ?? blogConfig.tools_page_title,
-      tools_page_description: config?.site?.tools_page_description ?? blogConfig.tools_page_description,
-      tools_page_content: config?.site?.tools_page_content ?? blogConfig.tools_page_content,
+      tools_page_title:
+        config?.site?.tools_page_title ?? blogConfig.tools_page_title,
+      tools_page_description:
+        config?.site?.tools_page_description ??
+        blogConfig.tools_page_description,
+      tools_page_content:
+        config?.site?.tools_page_content ?? blogConfig.tools_page_content,
       social: migrateSocial(config?.site?.social),
       icons: {
         faviconSvg:
@@ -102,7 +106,8 @@ export function resolveSiteConfig(
           config?.site?.icons?.faviconIco || blogConfig.icons.faviconIco,
         favicon96: config?.site?.icons?.favicon96 || blogConfig.icons.favicon96,
         appleTouchIcon:
-          config?.site?.icons?.appleTouchIcon || blogConfig.icons.appleTouchIcon,
+          config?.site?.icons?.appleTouchIcon ||
+          blogConfig.icons.appleTouchIcon,
         webApp192: config?.site?.icons?.webApp192 || blogConfig.icons.webApp192,
         webApp512: config?.site?.icons?.webApp512 || blogConfig.icons.webApp512,
       },
@@ -129,9 +134,11 @@ export function resolveSiteConfig(
         },
         fuwari: {
           homeBg:
-            config?.site?.theme?.fuwari?.homeBg ?? blogConfig.theme.fuwari.homeBg,
+            config?.site?.theme?.fuwari?.homeBg ??
+            blogConfig.theme.fuwari.homeBg,
           avatar:
-            config?.site?.theme?.fuwari?.avatar ?? blogConfig.theme.fuwari.avatar,
+            config?.site?.theme?.fuwari?.avatar ??
+            blogConfig.theme.fuwari.avatar,
           primaryHue:
             config?.site?.theme?.fuwari?.primaryHue ??
             blogConfig.theme.fuwari.primaryHue,

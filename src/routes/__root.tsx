@@ -30,6 +30,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
   },
   head: ({ loaderData }) => {
     const env = clientEnv();
+    const gtagId = env.VITE_GOOGLE_ANALYTICS_ID;
 
     return {
       meta: [
@@ -97,15 +98,31 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
           href: "/feed.json",
         },
       ],
-      scripts: env.VITE_UMAMI_WEBSITE_ID
-        ? [
-            {
-              src: "/stats.js",
-              defer: true,
-              "data-website-id": env.VITE_UMAMI_WEBSITE_ID,
-            },
-          ]
-        : [],
+      scripts: [
+        ...(env.VITE_UMAMI_WEBSITE_ID
+          ? [
+              {
+                src: "/stats.js",
+                defer: true,
+                "data-website-id": env.VITE_UMAMI_WEBSITE_ID,
+              },
+            ]
+          : []),
+        ...(gtagId
+          ? [
+              {
+                src: `https://www.googletagmanager.com/gtag/js?id=${gtagId}`,
+                async: true,
+              },
+              {
+                children: `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${gtagId}');`,
+              },
+            ]
+          : []),
+      ],
     };
   },
   shellComponent: RootDocument,

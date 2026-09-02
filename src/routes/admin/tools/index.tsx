@@ -114,7 +114,9 @@ function RouteComponent() {
           ) : (
             <Check size={14} className="mr-3" />
           )}
-          {isSubmitting ? m.admin_tools_page_btn_saving() : m.admin_tools_page_btn_save()}
+          {isSubmitting
+            ? m.admin_tools_page_btn_saving()
+            : m.admin_tools_page_btn_save()}
         </Button>
       </div>
 
@@ -134,7 +136,9 @@ function RouteComponent() {
             className={errors.tools_page_title ? "border-destructive" : ""}
           />
           {errors.tools_page_title && (
-            <p className="text-xs text-destructive">{errors.tools_page_title.message}</p>
+            <p className="text-xs text-destructive">
+              {errors.tools_page_title.message}
+            </p>
           )}
         </div>
 
@@ -149,10 +153,14 @@ function RouteComponent() {
           <Input
             {...register("tools_page_description")}
             placeholder={m.settings_site_field_tools_page_desc_ph()}
-            className={errors.tools_page_description ? "border-destructive" : ""}
+            className={
+              errors.tools_page_description ? "border-destructive" : ""
+            }
           />
           {errors.tools_page_description && (
-            <p className="text-xs text-destructive">{errors.tools_page_description.message}</p>
+            <p className="text-xs text-destructive">
+              {errors.tools_page_description.message}
+            </p>
           )}
         </div>
 
@@ -171,7 +179,9 @@ function RouteComponent() {
             className={errors.tools_page_content ? "border-destructive" : ""}
           />
           {errors.tools_page_content && (
-            <p className="text-xs text-destructive">{errors.tools_page_content.message}</p>
+            <p className="text-xs text-destructive">
+              {errors.tools_page_content.message}
+            </p>
           )}
         </div>
       </div>
