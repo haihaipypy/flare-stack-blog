@@ -64,6 +64,7 @@ export function MobileMenu({
             <Link
               key={item.id}
               to={item.to}
+              params={item.params}
               onClick={onClose}
               className={`group flex items-center gap-4 transition-all duration-500 ${
                 isOpen

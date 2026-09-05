@@ -89,6 +89,17 @@ export function SiteSettingsSection() {
             placeholder={m.settings_site_field_description_ph()}
           />
         </Field>
+        <Field
+          label={m.settings_site_field_bio()}
+          hint={m.settings_site_field_bio_hint()}
+          error={errors.site?.bio?.message}
+        >
+          <Textarea
+            {...register("site.bio")}
+            className={getInputClassName(errors.site?.bio?.message)}
+            placeholder={m.settings_site_field_bio_ph()}
+          />
+        </Field>
       </SectionShell>
 
       <SectionShell

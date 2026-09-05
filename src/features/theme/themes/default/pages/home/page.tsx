@@ -51,7 +51,7 @@ export function HomePage({ posts, pinnedPosts }: HomePageProps) {
                 {siteConfig.author}
               </span>
               {m.home_intro_separator()}
-              {siteConfig.description}
+              {siteConfig.bio ?? siteConfig.description}
             </p>
           </div>
         </header>

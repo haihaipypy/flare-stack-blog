@@ -48,7 +48,7 @@ export function PostsPage({
           {m.nav_posts()}
         </h1>
         <p className="max-w-xl text-base md:text-lg font-light text-muted-foreground leading-relaxed">
-          {siteConfig.description}
+          {siteConfig.bio ?? siteConfig.description}
         </p>
       </header>
 

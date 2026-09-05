@@ -8,6 +8,8 @@ export interface NavOption {
   label: string;
   to: keyof FileRoutesByTo;
   id: string;
+  /** 可选：路由参数（如文章路由 `/post/$slug` 的 slug） */
+  params?: Record<string, string>;
 }
 
 export interface UserInfo {

@@ -91,6 +91,7 @@ export function resolveSiteConfig(
       title: config?.site?.title ?? blogConfig.title,
       author: config?.site?.author ?? blogConfig.author,
       description: config?.site?.description ?? blogConfig.description,
+      bio: config?.site?.bio ?? blogConfig.bio,
       tools_page_title:
         config?.site?.tools_page_title ?? blogConfig.tools_page_title,
       tools_page_description:

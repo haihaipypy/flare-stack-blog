@@ -53,6 +53,7 @@ export function Navbar({
               <Link
                 key={option.id}
                 to={option.to}
+                params={option.params}
                 className="text-[11px] font-medium uppercase tracking-widest text-muted-foreground/60 hover:text-foreground transition-colors"
                 activeProps={{
                   className: "!text-foreground",

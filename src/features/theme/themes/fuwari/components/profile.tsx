@@ -31,7 +31,7 @@ export function Profile() {
           style={{ backgroundColor: "var(--fuwari-primary)" }}
         />
         <div className="fuwari-text-50 text-sm mb-2.5">
-          {siteConfig.description}
+          {siteConfig.bio ?? siteConfig.description}
         </div>
         <div className="flex flex-wrap gap-2 justify-center">
           {siteConfig.social

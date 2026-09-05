@@ -54,6 +54,18 @@ function PublicLayout() {
       id: "tools",
     },
     {
+      label: m.nav_about(),
+      to: "/post/$slug" as const,
+      params: { slug: "about" },
+      id: "about",
+    },
+    {
+      label: m.nav_privacy(),
+      to: "/post/$slug" as const,
+      params: { slug: "Privacy" },
+      id: "privacy",
+    },
+    {
       label: m.nav_friend_links(),
       to: "/friend-links" as const,
       id: "friend-links",

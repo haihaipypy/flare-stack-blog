@@ -118,6 +118,7 @@ export function Navbar({
                 <Link
                   key={option.id}
                   to={option.to}
+                  params={option.params}
                   className="fuwari-expand-animation rounded-lg h-11 font-bold px-5 active:scale-95 flex items-center fuwari-text-75 hover:text-(--fuwari-primary)"
                   activeProps={{
                     className: "!text-[var(--fuwari-primary)]",
