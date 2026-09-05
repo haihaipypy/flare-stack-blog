@@ -76,6 +76,22 @@ export function MobileMenu({
                       </span>
                     </Link>
                   ))}
+                {item.id === "about" &&
+                  [
+                    { label: m.nav_about(), slug: "about" },
+                    { label: m.nav_privacy(), slug: "Privacy" },
+                    { label: m.nav_service(), slug: "Service" },
+                  ].map((sub) => (
+                    <Link
+                      key={sub.slug}
+                      to="/post/$slug"
+                      params={{ slug: sub.slug }}
+                      onClick={onClose}
+                      className="flex items-center w-full pl-9 pr-4 py-1.5 text-sm rounded-lg transition-colors fuwari-text-50 hover:bg-(--fuwari-btn-regular-bg) hover:text-(--fuwari-primary) active:scale-[0.98]"
+                    >
+                      {sub.label}
+                    </Link>
+                  ))}
               </Fragment>
             ))}
 

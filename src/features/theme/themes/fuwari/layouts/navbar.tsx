@@ -114,6 +114,42 @@ export function Navbar({
                     </div>
                   </div>
                 </div>
+              ) : option.id === "about" ? (
+                <div key={option.id} className="relative group">
+                  <Link
+                    to={option.to}
+                    params={option.params}
+                    className="fuwari-expand-animation rounded-lg h-11 font-bold px-5 active:scale-95 flex items-center gap-1 fuwari-text-75 hover:text-(--fuwari-primary)"
+                    activeProps={{
+                      className: "!text-[var(--fuwari-primary)]",
+                    }}
+                  >
+                    {option.label}
+                    <ChevronDown
+                      size={14}
+                      strokeWidth={2}
+                      className="mt-0.5 transition-transform duration-200 group-hover:rotate-180"
+                    />
+                  </Link>
+                  <div className="absolute left-0 top-full pt-2 z-50 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+                    <div className="fuwari-card-base rounded-xl py-2 px-1 min-w-36 flex flex-col gap-0.5 shadow-lg ring-1 ring-black/5 dark:ring-white/10">
+                      {[
+                        { label: m.nav_about(), slug: "about" },
+                        { label: m.nav_privacy(), slug: "Privacy" },
+                        { label: m.nav_service(), slug: "Service" },
+                      ].map((item) => (
+                        <Link
+                          key={item.slug}
+                          to="/post/$slug"
+                          params={{ slug: item.slug }}
+                          className="flex items-center px-3 py-1.5 rounded-lg text-sm fuwari-text-75 hover:bg-(--fuwari-btn-regular-bg) hover:text-(--fuwari-primary) whitespace-nowrap"
+                        >
+                          {item.label}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               ) : (
                 <Link
                   key={option.id}

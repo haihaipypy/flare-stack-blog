@@ -60,12 +60,6 @@ function PublicLayout() {
       id: "about",
     },
     {
-      label: m.nav_privacy(),
-      to: "/post/$slug" as const,
-      params: { slug: "Privacy" },
-      id: "privacy",
-    },
-    {
       label: m.nav_friend_links(),
       to: "/friend-links" as const,
       id: "friend-links",
