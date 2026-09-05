@@ -89,46 +89,6 @@ export function SiteSettingsSection() {
             placeholder={m.settings_site_field_description_ph()}
           />
         </Field>
-        <Field
-          label={m.settings_site_field_tools_page_title()}
-          error={errors.site?.tools_page_title?.message}
-        >
-          <Input
-            {...register("site.tools_page_title")}
-            className={getInputClassName(
-              errors.site?.tools_page_title?.message,
-            )}
-            placeholder={m.settings_site_field_tools_page_title_ph()}
-          />
-        </Field>
-
-        <Field
-          label={m.settings_site_field_tools_page_desc()}
-          hint={m.settings_site_field_tools_page_desc_hint()}
-          error={errors.site?.tools_page_description?.message}
-        >
-          <Textarea
-            {...register("site.tools_page_description")}
-            className={getInputClassName(
-              errors.site?.tools_page_description?.message,
-            )}
-            placeholder={m.settings_site_field_tools_page_desc_ph()}
-          />
-        </Field>
-
-        <Field
-          label={m.settings_site_field_tools_page_content()}
-          hint={m.settings_site_field_tools_page_content_hint()}
-          error={errors.site?.tools_page_content?.message}
-        >
-          <Textarea
-            {...register("site.tools_page_content")}
-            className={getInputClassName(
-              errors.site?.tools_page_content?.message,
-            )}
-            placeholder={m.settings_site_field_tools_page_content_ph()}
-          />
-        </Field>
       </SectionShell>
 
       <SectionShell
