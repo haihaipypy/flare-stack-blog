@@ -7,6 +7,12 @@ export const McpTagSchema = z.object({
   name: z.string().describe("Tag name."),
 });
 
+export const McpCategorySchema = z.object({
+  createdAt: z.iso.datetime().describe("Category creation time."),
+  id: z.number().describe("Numeric category ID."),
+  name: z.string().describe("Category name."),
+});
+
 export const McpPostsListInputSchema = z.object({
   offset: z.number().optional().describe("Result offset."),
   limit: z.number().optional().describe("Maximum number of posts to return."),
@@ -37,6 +43,10 @@ export const McpPostSummarySchema = z.object({
 
 export const McpPostListItemSchema = McpPostSummarySchema.extend({
   tags: z.array(McpTagSchema).optional().describe("Assigned tags."),
+  categories: z
+    .array(McpCategorySchema)
+    .optional()
+    .describe("Assigned categories."),
 });
 
 export const McpPostsListOutputSchema = z.object({
@@ -52,6 +62,10 @@ export const McpPostDetailSchema = McpPostSummarySchema.extend({
   hasPublicCache: z.boolean().describe("Whether a public snapshot exists."),
   isSynced: z.boolean().describe("Whether the public snapshot is up to date."),
   tags: z.array(McpTagSchema).optional().describe("Assigned tags."),
+  categories: z
+    .array(McpCategorySchema)
+    .optional()
+    .describe("Assigned categories."),
 });
 
 export const McpPostCreateDraftOutputSchema = z.object({
@@ -93,6 +107,12 @@ export const McpPostUpdateInputSchema = z
       .describe(
         "Full post body as markdown. Converted to editor JSON internally.",
       ),
+    categoryIds: z
+      .array(z.number())
+      .optional()
+      .describe(
+        "Complete list of category IDs to assign. When provided, replaces all current categories. Unknown IDs must be created separately via categories_create.",
+      ),
   })
   .refine(
     (value) =>
@@ -102,7 +122,8 @@ export const McpPostUpdateInputSchema = z
       value.status !== undefined ||
       value.publishedAt !== undefined ||
       value.readTimeInMinutes !== undefined ||
-      value.contentMarkdown !== undefined,
+      value.contentMarkdown !== undefined ||
+      value.categoryIds !== undefined,
     {
       message: "At least one field must be provided.",
     },

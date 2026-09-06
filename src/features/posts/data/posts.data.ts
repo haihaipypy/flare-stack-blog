@@ -324,15 +324,21 @@ export async function findPostById(db: DB, id: number) {
           tag: true,
         },
       },
+      postCategories: {
+        with: {
+          category: true,
+        },
+      },
     },
   });
 
   if (!post) return null;
 
-  // Flatten tags
+  // Flatten tags and categories
   const tags = post.postTags.map((pt) => pt.tag);
-  const { postTags, ...rest } = post;
-  return { ...rest, tags };
+  const categories = post.postCategories.map((pc) => pc.category);
+  const { postTags, postCategories, ...rest } = post;
+  return { ...rest, tags, categories };
 }
 
 export async function findPinnedPosts(db: DB) {

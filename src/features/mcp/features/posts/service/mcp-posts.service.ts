@@ -16,7 +16,24 @@ function serializeTag(tag: {
   };
 }
 
+function serializeCategory(category: {
+  createdAt: Date | string;
+  id: number;
+  name: string;
+}) {
+  return {
+    createdAt: serializeMcpDate(category.createdAt),
+    id: category.id,
+    name: category.name,
+  };
+}
+
 export function serializeMcpPostListItem(post: {
+  categories?: Array<{
+    createdAt: Date | string;
+    id: number;
+    name: string;
+  }>;
   createdAt: Date | string;
   id: number;
   publishedAt: Date | string | null;
@@ -33,6 +50,7 @@ export function serializeMcpPostListItem(post: {
   updatedAt: Date | string;
 }) {
   return {
+    categories: post.categories?.map(serializeCategory),
     createdAt: serializeMcpDate(post.createdAt),
     id: post.id,
     publishedAt: serializeMcpDate(post.publishedAt),
@@ -47,6 +65,11 @@ export function serializeMcpPostListItem(post: {
 }
 
 export function serializeMcpPostDetail(post: {
+  categories?: Array<{
+    createdAt: Date | string;
+    id: number;
+    name: string;
+  }>;
   contentJson: unknown;
   createdAt: Date | string;
   hasPublicCache: boolean;
@@ -84,6 +107,7 @@ type McpPostUpdateInput = {
   publishedAt?: string | null;
   readTimeInMinutes?: number;
   contentMarkdown?: string;
+  categoryIds?: Array<number>;
 };
 
 function normalizeMcpMarkdownInput(markdown: string) {
@@ -110,7 +134,7 @@ function normalizeMcpMarkdownInput(markdown: string) {
 
 export async function toPostUpdateInput(
   input: McpPostUpdateInput,
-): Promise<UpdatePostInput> {
+): Promise<{ update: UpdatePostInput; categoryIds?: Array<number> }> {
   const data: UpdatePostInput["data"] = {};
 
   if (input.title !== undefined) {
@@ -144,7 +168,10 @@ export async function toPostUpdateInput(
   }
 
   return {
-    id: input.id,
-    data,
+    update: {
+      id: input.id,
+      data,
+    },
+    categoryIds: input.categoryIds,
   };
 }

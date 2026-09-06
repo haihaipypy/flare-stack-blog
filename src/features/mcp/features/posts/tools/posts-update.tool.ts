@@ -1,4 +1,5 @@
 import type { OAuthScopeRequest } from "@/features/oauth-provider/schema/oauth-provider.schema";
+import * as CategoryService from "@/features/categories/categories.service";
 import * as PostService from "@/features/posts/services/posts.service";
 import { defineMcpTool } from "../../../service/mcp-tool";
 import {
@@ -22,8 +23,8 @@ export const postsUpdateTool = defineMcpTool({
   inputSchema: McpPostUpdateInputSchema,
   outputSchema: McpPostDetailSchema,
   async handler(args, context) {
-    const updateInput = await toPostUpdateInput(args);
-    const result = await PostService.updatePost(context, updateInput);
+    const { update, categoryIds } = await toPostUpdateInput(args);
+    const result = await PostService.updatePost(context, update);
 
     if (result.error) {
       return {
@@ -35,6 +36,13 @@ export const postsUpdateTool = defineMcpTool({
         ],
         isError: true,
       };
+    }
+
+    if (categoryIds !== undefined) {
+      await CategoryService.setPostCategories(context, {
+        postId: args.id,
+        categoryIds,
+      });
     }
 
     const post = await PostService.findPostById(context, {
