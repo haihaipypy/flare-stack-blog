@@ -9,7 +9,7 @@ import { serverEnv } from "@/lib/env/server.env";
 import type { Result } from "@/lib/errors";
 import { err, ok } from "@/lib/errors";
 
-const GITHUB_REPO = "du2333/flare-stack-blog";
+const GITHUB_REPO = "haihaipypy/flare-stack-blog";
 
 type CheckForUpdateResult = Result<
   UpdateCheckResult,

@@ -7,9 +7,9 @@
 基于 **Cloudflare Workers** 的全栈现代化博客 CMS<br>
 深度集成 D1、R2、KV、Workflows 等 Serverless 服务
 
-[![License](https://img.shields.io/github/license/du2333/flare-stack-blog?style=flat-square)](https://github.com/du2333/flare-stack-blog/blob/main/LICENSE)
-[![GitHub stars](https://img.shields.io/github/stars/du2333/flare-stack-blog?style=flat-square)](https://github.com/du2333/flare-stack-blog/stargazers)
-[![GitHub forks](https://img.shields.io/github/forks/du2333/flare-stack-blog?style=flat-square)](https://github.com/du2333/flare-stack-blog/network/members)
+[![License](https://img.shields.io/github/license/haihaipypy/flare-stack-blog?style=flat-square)](https://github.com/haihaipypy/flare-stack-blog/blob/main/LICENSE)
+[![GitHub stars](https://img.shields.io/github/stars/haihaipypy/flare-stack-blog?style=flat-square)](https://github.com/haihaipypy/flare-stack-blog/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/haihaipypy/flare-stack-blog?style=flat-square)](https://github.com/haihaipypy/flare-stack-blog/network/members)
 [![React](https://img.shields.io/badge/React-19-blue?logo=react&style=flat-square)](https://react.dev)
 [![TanStack Start](https://img.shields.io/badge/TanStack%20Start-black?logo=tanstack&style=flat-square)](https://tanstack.com/start)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind-4.0-38B2AC?logo=tailwind-css&style=flat-square)](https://tailwindcss.com)

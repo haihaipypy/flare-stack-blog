@@ -15,7 +15,7 @@
 
 ```bash
 # 克隆仓库
-git clone https://github.com/du2333/flare-stack-blog.git
+git clone https://github.com/haihaipypy/flare-stack-blog.git
 cd flare-stack-blog
 
 # 安装依赖

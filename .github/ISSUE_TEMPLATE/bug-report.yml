@@ -1,7 +1,7 @@
 name: Bug 报告
 description: 报告程序运行中的错误
 labels: ["bug"]
-assignees: du2333
+assignees: haihaipypy
 body:
   - type: textarea
     id: description
