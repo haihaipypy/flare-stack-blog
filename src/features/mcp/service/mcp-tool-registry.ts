@@ -6,6 +6,7 @@ import { mcpFriendLinksTools } from "../features/friend-links";
 import { mcpMediaTools } from "../features/media";
 import { mcpPostsTools } from "../features/posts";
 import { mcpSearchTools } from "../features/search";
+import { mcpSystemTools } from "../features/system";
 import { mcpTagsTools } from "../features/tags";
 import type { McpToolContext } from "./mcp.types";
 import type { McpToolDefinition } from "./mcp-tool";
@@ -19,6 +20,7 @@ const MCP_TOOLS: McpToolDefinition[] = [
   ...mcpMediaTools,
   ...mcpPostsTools,
   ...mcpSearchTools,
+  ...mcpSystemTools,
   ...mcpTagsTools,
 ];
 
