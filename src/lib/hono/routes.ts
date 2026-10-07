@@ -5,6 +5,7 @@ import { proxy } from "hono/proxy";
 import categoriesRoute from "@/features/categories/api/hono/categories.list.route";
 import { exportDownloadRoute } from "@/features/import-export/api/hono/download.route";
 import { handleImageRequest } from "@/features/media/service/media.service";
+import postsAdjacentRoute from "@/features/posts/api/hono/posts.adjacent.route";
 import postsDetailRoute from "@/features/posts/api/hono/posts.detail.route";
 import postsListRoute from "@/features/posts/api/hono/posts.list.route";
 import postsRelatedRoute from "@/features/posts/api/hono/posts.related.route";
@@ -43,6 +44,7 @@ const publicApi = new Hono<{ Bindings: Env }>()
   .route("/posts", postsListRoute)
   .route("/post", postsDetailRoute)
   .route("/post", postsRelatedRoute)
+  .route("/post", postsAdjacentRoute)
   .route("/tags", tagsRoute)
   .route("/categories", categoriesRoute)
   .route("/search", searchRoute);

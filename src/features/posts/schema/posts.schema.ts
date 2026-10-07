@@ -79,9 +79,31 @@ export const FindRelatedPostsInputSchema = z.object({
   limit: z.number().optional(),
 });
 
+/** 文章详情页的"上一篇 / 下一篇"（按发布时间相邻）。 */
+export const AdjacentPostRefSchema = z.object({
+  slug: z.string(),
+  title: z.string(),
+});
+
+export const AdjacentPostsSchema = z.object({
+  /** 发布时间更晚的一篇。 */
+  newer: AdjacentPostRefSchema.nullable(),
+  /** 发布时间更早的一篇。 */
+  older: AdjacentPostRefSchema.nullable(),
+});
+
+export const FindAdjacentPostsInputSchema = z.object({
+  slug: z.string(),
+});
+
 export type GetPostsCursorInput = z.infer<typeof GetPostsCursorInputSchema>;
 export type FindPostBySlugInput = z.infer<typeof FindPostBySlugInputSchema>;
 export type FindRelatedPostsInput = z.infer<typeof FindRelatedPostsInputSchema>;
+export type FindAdjacentPostsInput = z.infer<
+  typeof FindAdjacentPostsInputSchema
+>;
+export type AdjacentPostRef = z.infer<typeof AdjacentPostRefSchema>;
+export type AdjacentPosts = z.infer<typeof AdjacentPostsSchema>;
 
 // Admin API Schemas
 export const GenerateSlugInputSchema = z.object({
@@ -161,6 +183,7 @@ export const POSTS_CACHE_KEYS = {
   detail: (version: string, slug: string) => [version, "post", slug] as const,
   related: (slug: string, limit?: number) =>
     ["posts", "related-ids", slug, limit] as const,
+  adjacent: (slug: string) => ["posts", "adjacent", slug] as const,
   syncHash: (id: number) => `post_hash:${id}` as const,
   pinned: (version: string) => [version, "posts", "pinned"] as const,
 } as const;

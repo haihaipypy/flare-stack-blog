@@ -1,63 +1,46 @@
 import { Check, Copy } from "lucide-react";
 import { memo, useState } from "react";
+import { ThemedMermaidDiagram } from "@/components/content/themed-mermaid-diagram";
+import { isPlainTextLanguage, resolveCodeLanguage } from "@/lib/code-languages";
 import { m } from "@/paraglide/messages";
-
-// Map short codes to display labels
-const LANGUAGE_MAP: Record<string, string> = {
-  ts: "TypeScript",
-  typescript: "TypeScript",
-  js: "JavaScript",
-  javascript: "JavaScript",
-  jsx: "JSX",
-  tsx: "TSX",
-  py: "Python",
-  python: "Python",
-  rb: "Ruby",
-  ruby: "Ruby",
-  go: "Go",
-  rs: "Rust",
-  rust: "Rust",
-  java: "Java",
-  cpp: "C++",
-  c: "C",
-  php: "PHP",
-  css: "CSS",
-  html: "HTML",
-  json: "JSON",
-  yaml: "YAML",
-  xml: "XML",
-  sql: "SQL",
-  sh: "Shell",
-  bash: "Bash",
-  md: "Markdown",
-};
 
 interface CodeBlockProps {
   code: string;
   language: string | null;
   highlightedHtml?: string;
+  /**
+   * Mermaid source. When set the block renders a diagram instead of the
+   * highlighted code, with the code as the fallback until it draws.
+   */
+  diagramSource?: string;
 }
 
 export const CodeBlock = memo(
-  ({ code, language, highlightedHtml }: CodeBlockProps) => {
+  ({ code, language, highlightedHtml, diagramSource }: CodeBlockProps) => {
     const fallback = `<pre class="shiki font-mono text-sm leading-relaxed whitespace-pre-wrap text-foreground bg-transparent! p-0 m-0 border-0"><code>${code}</code></pre>`;
     const html = highlightedHtml || fallback;
 
     const [copied, setCopied] = useState(false);
 
     // Helper to get display label
-    const normalizedLanguage = language?.toLowerCase();
-    const displayLanguage = normalizedLanguage
-      ? normalizedLanguage === "text" || normalizedLanguage === "txt"
-        ? m.common_plain_text()
-        : LANGUAGE_MAP[normalizedLanguage] || language
-      : m.common_plain_text();
+    const displayLanguage = isPlainTextLanguage(language)
+      ? m.common_plain_text()
+      : (resolveCodeLanguage(language)?.label ?? language?.toLowerCase());
 
     const handleCopy = () => {
       navigator.clipboard.writeText(code);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     };
+
+    const codeArea = (
+      <div className="text-sm font-mono leading-relaxed transition-opacity duration-300">
+        <div
+          className="[&>pre]:p-6 [&>pre]:m-0 [&>pre]:min-w-full [&>pre]:w-fit [&>pre]:rounded-b-sm [&>pre>code]:p-0"
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+      </div>
+    );
 
     return (
       <div className="my-12 group relative max-w-full">
@@ -86,15 +69,21 @@ export const CodeBlock = memo(
             </button>
           </div>
 
-          {/* Code Area */}
-          <div className="relative p-0 overflow-x-auto custom-scrollbar rounded-b-sm">
-            <div className="text-sm font-mono leading-relaxed transition-opacity duration-300">
-              <div
-                className="[&>pre]:p-6 [&>pre]:m-0 [&>pre]:min-w-full [&>pre]:w-fit [&>pre]:rounded-b-sm [&>pre>code]:p-0"
-                dangerouslySetInnerHTML={{ __html: html }}
+          {diagramSource ? (
+            /* Diagram Area */
+            <div className="relative rounded-b-sm px-6 py-4 text-foreground">
+              <ThemedMermaidDiagram
+                source={diagramSource}
+                variant="default"
+                fallback={codeArea}
               />
             </div>
-          </div>
+          ) : (
+            /* Code Area */
+            <div className="relative p-0 overflow-x-auto custom-scrollbar rounded-b-sm">
+              {codeArea}
+            </div>
+          )}
         </div>
       </div>
     );

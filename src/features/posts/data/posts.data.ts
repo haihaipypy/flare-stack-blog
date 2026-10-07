@@ -1,8 +1,10 @@
 import {
   and,
+  asc,
   count,
   desc,
   eq,
+  gt,
   inArray,
   isNotNull,
   like,
@@ -568,6 +570,72 @@ export async function getRelatedPostIds(
     .limit(limit);
 
   return matchingPosts.map((p) => p.id);
+}
+
+export type AdjacentPublicPosts = {
+  /** 发布时间更晚的一篇（"上一篇"）。 */
+  newer: { slug: string; title: string } | null;
+  /** 发布时间更早的一篇（"下一篇"）。 */
+  older: { slug: string; title: string } | null;
+};
+
+/**
+ * 按发布时间找出当前文章相邻的两篇（更新 / 更旧各一篇）。
+ * 同一发布时间用 id 兜底排序，保证顺序稳定。只考虑已公开的文章。
+ */
+export async function findAdjacentPublicPosts(
+  db: DB,
+  slug: string,
+): Promise<AdjacentPublicPosts> {
+  const current = await db.query.PostsTable.findFirst({
+    where: and(eq(PostsTable.slug, slug), buildPostWhereClause({ publicOnly: true })),
+    columns: { id: true, publishedAt: true },
+  });
+
+  if (!current?.publishedAt) {
+    return { newer: null, older: null };
+  }
+
+  const publicOnly = buildPostWhereClause({ publicOnly: true });
+  const { id, publishedAt } = current;
+
+  const [newer] = await db
+    .select({ slug: PostsTable.slug, title: PostsTable.title })
+    .from(PostsTable)
+    .where(
+      and(
+        publicOnly,
+        or(
+          gt(PostsTable.publishedAt, publishedAt),
+          and(
+            eq(PostsTable.publishedAt, publishedAt),
+            gt(PostsTable.id, id),
+          ),
+        ),
+      ),
+    )
+    .orderBy(asc(PostsTable.publishedAt), asc(PostsTable.id))
+    .limit(1);
+
+  const [older] = await db
+    .select({ slug: PostsTable.slug, title: PostsTable.title })
+    .from(PostsTable)
+    .where(
+      and(
+        publicOnly,
+        or(
+          lt(PostsTable.publishedAt, publishedAt),
+          and(
+            eq(PostsTable.publishedAt, publishedAt),
+            lt(PostsTable.id, id),
+          ),
+        ),
+      ),
+    )
+    .orderBy(desc(PostsTable.publishedAt), desc(PostsTable.id))
+    .limit(1);
+
+  return { newer: newer ?? null, older: older ?? null };
 }
 
 export async function getPublicPostsByIds(db: DB, ids: Array<number>) {

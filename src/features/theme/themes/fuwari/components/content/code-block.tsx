@@ -1,48 +1,25 @@
 import { Check, ChevronDown, Copy } from "lucide-react";
 import { memo, useLayoutEffect, useRef, useState } from "react";
+import { ThemedMermaidDiagram } from "@/components/content/themed-mermaid-diagram";
+import { isPlainTextLanguage, resolveCodeLanguage } from "@/lib/code-languages";
 import { cn } from "@/lib/utils";
 import { m } from "@/paraglide/messages";
-
-// Map short codes to display labels
-const LANGUAGE_MAP: Record<string, string> = {
-  ts: "TypeScript",
-  typescript: "TypeScript",
-  js: "JavaScript",
-  javascript: "JavaScript",
-  jsx: "JSX",
-  tsx: "TSX",
-  py: "Python",
-  python: "Python",
-  rb: "Ruby",
-  ruby: "Ruby",
-  go: "Go",
-  rs: "Rust",
-  rust: "Rust",
-  java: "Java",
-  cpp: "C++",
-  c: "C",
-  php: "PHP",
-  css: "CSS",
-  html: "HTML",
-  json: "JSON",
-  yaml: "YAML",
-  xml: "XML",
-  sql: "SQL",
-  sh: "sh",
-  bash: "bash",
-  md: "Markdown",
-};
 
 interface CodeBlockProps {
   code: string;
   language: string | null;
   highlightedHtml?: string;
+  /**
+   * Mermaid source. When set the block renders a diagram instead of the
+   * highlighted code, with the code as the fallback until it draws.
+   */
+  diagramSource?: string;
 }
 
 const FOLD_THRESHOLD = 400;
 
 export const CodeBlock = memo(
-  ({ code, language, highlightedHtml }: CodeBlockProps) => {
+  ({ code, language, highlightedHtml, diagramSource }: CodeBlockProps) => {
     const fallback = `<pre class="shiki font-mono text-sm leading-relaxed whitespace-pre text-(--fuwari-btn-content) bg-transparent! p-0 m-0 border-0"><code>${code}</code></pre>`;
     const html = highlightedHtml || fallback;
 
@@ -53,6 +30,8 @@ export const CodeBlock = memo(
     const contentRef = useRef<HTMLDivElement>(null);
 
     useLayoutEffect(() => {
+      // Diagrams size themselves; folding only applies to code.
+      if (diagramSource) return;
       if (contentRef.current) {
         // If the content is taller than our threshold, enable folding
         const scrollHeight = contentRef.current.scrollHeight;
@@ -61,21 +40,27 @@ export const CodeBlock = memo(
           setContentHeight(scrollHeight);
         }
       }
-    }, [html]);
+    }, [html, diagramSource]);
 
     // Helper to get display label (following expressive-code language badge logic)
-    const normalizedLanguage = language?.toLowerCase();
-    const displayLanguage = normalizedLanguage
-      ? normalizedLanguage === "text" || normalizedLanguage === "txt"
-        ? m.common_plain_text()
-        : LANGUAGE_MAP[normalizedLanguage] || normalizedLanguage
-      : m.common_plain_text();
+    const displayLanguage = isPlainTextLanguage(language)
+      ? m.common_plain_text()
+      : (resolveCodeLanguage(language)?.label ?? language?.toLowerCase());
 
     const handleCopy = () => {
       navigator.clipboard.writeText(code);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     };
+
+    const codeArea = (
+      <div className="text-sm font-mono leading-relaxed transition-opacity duration-300">
+        <div
+          className="[&>pre]:px-5 [&>pre]:py-4 [&>pre]:m-0 [&>pre]:min-w-full [&>pre]:w-fit [&_code]:block [&_code]:w-fit [&>pre]:rounded-xl [&>pre>code]:p-0"
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+      </div>
+    );
 
     return (
       <div className="relative group max-w-full my-6 not-prose">
@@ -117,54 +102,60 @@ export const CodeBlock = memo(
             </div>
           </button>
 
-          {/* Code Area with Folding Support */}
-          <div
-            className={cn("fuwari-code-folding-wrapper custom-scrollbar")}
-            style={
-              needsFolding
-                ? { maxHeight: isCollapsed ? FOLD_THRESHOLD : contentHeight }
-                : undefined
-            }
-          >
-            <div
-              ref={contentRef}
-              className="text-sm font-mono leading-relaxed transition-opacity duration-300"
-            >
-              <div
-                className="[&>pre]:px-5 [&>pre]:py-4 [&>pre]:m-0 [&>pre]:min-w-full [&>pre]:w-fit [&_code]:block [&_code]:w-fit [&>pre]:rounded-xl [&>pre>code]:p-0"
-                dangerouslySetInnerHTML={{ __html: html }}
+          {diagramSource ? (
+            <div className="px-5 py-4">
+              <ThemedMermaidDiagram
+                source={diagramSource}
+                variant="fuwari"
+                fallback={codeArea}
               />
             </div>
-
-            {needsFolding && (
+          ) : (
+            <>
+              {/* Code Area with Folding Support */}
               <div
-                className={cn(
-                  "fuwari-code-mask transition-opacity duration-500",
-                  isCollapsed ? "opacity-100" : "opacity-0",
-                )}
-              />
-            )}
-          </div>
-
-          {/* Expand Button (Subtle Overlay Style) */}
-          {needsFolding && (
-            <div
-              className={cn(
-                "absolute bottom-4 left-0 right-0 flex justify-center z-20 pointer-events-none transition-all duration-500",
-                isCollapsed
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-4",
-              )}
-            >
-              <button
-                onClick={() => setIsCollapsed(false)}
-                disabled={!isCollapsed}
-                className="pointer-events-auto flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium text-black/50 hover:text-black/70 dark:text-white/50 dark:hover:text-white/70 bg-black/5 hover:bg-black/10 dark:bg-white/5 dark:hover:bg-white/10 transition-all active:scale-[0.98] backdrop-blur-md"
+                className={cn("fuwari-code-folding-wrapper custom-scrollbar")}
+                style={
+                  needsFolding
+                    ? {
+                        maxHeight: isCollapsed ? FOLD_THRESHOLD : contentHeight,
+                      }
+                    : undefined
+                }
               >
-                <ChevronDown size={16} />
-                <span>{m.common_show_more()}</span>
-              </button>
-            </div>
+                <div ref={contentRef}>{codeArea}</div>
+
+                {needsFolding && (
+                  <div
+                    className={cn(
+                      "fuwari-code-mask transition-opacity duration-500",
+                      isCollapsed ? "opacity-100" : "opacity-0",
+                    )}
+                  />
+                )}
+              </div>
+
+              {/* Expand Button (Subtle Overlay Style) */}
+              {needsFolding && (
+                <div
+                  className={cn(
+                    "absolute bottom-4 left-0 right-0 flex justify-center z-20 pointer-events-none transition-all duration-500",
+                    isCollapsed
+                      ? "opacity-100 translate-y-0"
+                      : "opacity-0 translate-y-4",
+                  )}
+                >
+                  <button
+                    onClick={() => setIsCollapsed(false)}
+                    disabled={!isCollapsed}
+                    className="pointer-events-auto flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-medium text-black/50 hover:text-black/70 dark:text-white/50 dark:hover:text-white/70 bg-black/5 hover:bg-black/10 dark:bg-white/5 dark:hover:bg-white/10 transition-all active:scale-[0.98] backdrop-blur-md"
+                  >
+                    <ChevronDown size={16} />
+                    <span>{m.common_show_more()}</span>
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>

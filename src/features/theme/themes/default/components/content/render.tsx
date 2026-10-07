@@ -4,6 +4,7 @@ import { MathFormula } from "@/components/content/math-formula";
 import { extensions } from "@/features/posts/editor/config";
 import { CodeBlock } from "@/features/theme/themes/default/components/content/code-block";
 import { ImageDisplay } from "@/features/theme/themes/default/components/content/image-display";
+import { isMermaidLanguage } from "@/lib/code-languages";
 
 export function renderReact(content: JSONContent) {
   return renderToReactElement({
@@ -47,12 +48,14 @@ export function renderReact(content: JSONContent) {
             language?: string | null;
             highlightedHtml?: string;
           };
+          const language = attrs.language || null;
 
           return (
             <CodeBlock
               code={code}
-              language={attrs.language || null}
+              language={language}
               highlightedHtml={attrs.highlightedHtml}
+              diagramSource={isMermaidLanguage(language) ? code : undefined}
             />
           );
         },

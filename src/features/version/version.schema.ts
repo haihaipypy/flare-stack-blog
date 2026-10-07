@@ -20,4 +20,6 @@ export type GitHubRelease = z.infer<typeof GitHubReleaseSchema>;
 
 export const VERSION_CACHE_KEYS = {
   updateCheck: ["version", "update-check"] as const,
+  // 最近一次检查失败的标记，避免管理后台每次加载都重试。
+  recentFailure: ["version", "recent-failure"] as const,
 } as const;

@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import * as PageviewService from "@/features/pageview/service/pageview.service";
 import {
+  FindAdjacentPostsInputSchema,
   FindPostBySlugInputSchema,
   FindRelatedPostsInputSchema,
   GetPostsCursorInputSchema,
@@ -28,6 +29,13 @@ export const getRelatedPostsFn = createServerFn()
   .inputValidator(FindRelatedPostsInputSchema)
   .handler(async ({ data, context }) => {
     return await PostService.getRelatedPosts(context, data);
+  });
+
+export const getAdjacentPostsFn = createServerFn()
+  .middleware([dbMiddleware])
+  .inputValidator(FindAdjacentPostsInputSchema)
+  .handler(async ({ data, context }) => {
+    return await PostService.getAdjacentPosts(context, data);
   });
 
 export const getPinnedPostsFn = createServerFn()

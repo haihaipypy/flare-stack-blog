@@ -9,6 +9,10 @@ import { authClient } from "@/lib/auth/auth.client";
 import { formatDate } from "@/lib/utils";
 import { m } from "@/paraglide/messages";
 import { CommentSection } from "../../components/comments/view/comment-section";
+import {
+  PostAdjacentNav,
+  PostAdjacentNavSkeleton,
+} from "./components/post-adjacent-nav";
 import { RelatedPosts, RelatedPostsSkeleton } from "./components/related-posts";
 import TableOfContents from "./components/table-of-contents";
 
@@ -155,8 +159,15 @@ export function PostPage({ post }: PostPageProps) {
           </main>
         </div>
 
+        {/* 上一篇 / 下一篇（按发布时间相邻） */}
+        <div className="pt-16">
+          <Suspense fallback={<PostAdjacentNavSkeleton />}>
+            <PostAdjacentNav slug={post.slug} />
+          </Suspense>
+        </div>
+
         {/* Related Posts */}
-        <div className="pt-24 border-t border-border/40">
+        <div className="pt-16 border-t border-border/40">
           <Suspense fallback={<RelatedPostsSkeleton />}>
             <RelatedPosts slug={post.slug} />
           </Suspense>

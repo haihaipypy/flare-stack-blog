@@ -6,6 +6,7 @@ import { FuwariCommentSection } from "@/features/theme/themes/fuwari/components/
 import { ContentRenderer } from "@/features/theme/themes/fuwari/components/content/content-renderer";
 import { authClient } from "@/lib/auth/auth.client";
 import { m } from "@/paraglide/messages";
+import { PostAdjacentNav, PostAdjacentNavSkeleton } from "./components/post-adjacent-nav";
 import { PostMeta } from "./components/post-meta";
 import { PostSummary } from "./components/post-summary";
 import { RelatedPosts, RelatedPostsSkeleton } from "./components/related-posts";
@@ -100,13 +101,10 @@ export function PostPage({ post }: PostPageProps) {
         </div>
       </div>
 
-      {/* Prev/Next buttons (Mock implementation for layout, actual data would come from the server in an ideal setup) */}
-      <div
-        className="hidden flex-col md:flex-row justify-between gap-4 overflow-hidden w-full fuwari-onload-animation"
-        style={{ animationDelay: "150ms" }}
-      >
-        {/* Note: the backend schema doesn't currently provide prev/next slugs in PostWithToc. Using placeholder layouts to match Fuwari exactly. */}
-      </div>
+      {/* 上一篇 / 下一篇（按发布时间相邻） */}
+      <Suspense fallback={<PostAdjacentNavSkeleton />}>
+        <PostAdjacentNav slug={post.slug} />
+      </Suspense>
 
       {/* Related Posts */}
       <Suspense fallback={<RelatedPostsSkeleton />}>

@@ -4,6 +4,7 @@ import type {
   GetPostsInput,
 } from "@/features/posts/schema/posts.schema";
 import {
+  AdjacentPostsSchema,
   normalizePostTagName,
   PostItemSchema,
   PostListResponseSchema,
@@ -18,6 +19,7 @@ import {
 import { findPostByIdFn } from "../api/posts.admin.api";
 import {
   findPostBySlugFn,
+  getAdjacentPostsFn,
   getPinnedPostsFn,
   getPopularPostsFn,
   getPostsCursorFn,
@@ -51,6 +53,7 @@ export const POSTS_KEYS = {
   detail: (idOrSlug: number | string) => ["posts", "detail", idOrSlug] as const,
   related: (slug: string, limit?: number) =>
     ["posts", "related", slug, limit] as const,
+  adjacent: (slug: string) => ["posts", "adjacent", slug] as const,
   adminList: (params: GetPostsInput) =>
     ["posts", "admin-list", params] as const,
   count: (params: GetPostsCountInput) => ["posts", "count", params] as const,
@@ -156,6 +159,25 @@ export function relatedPostsQuery(slug: string, limit?: number) {
         return [];
       }
       return result.data;
+    },
+  });
+}
+
+/**
+ * 文章详情页的"上一篇 / 下一篇"。SSR 走服务函数，客户端走 Hono 公开接口。
+ */
+export function adjacentPostsQuery(slug: string) {
+  return queryOptions({
+    queryKey: POSTS_KEYS.adjacent(slug),
+    queryFn: async () => {
+      if (isSSR) {
+        return await getAdjacentPostsFn({ data: { slug } });
+      }
+      const res = await apiClient.post[":slug"].adjacent.$get({
+        param: { slug },
+      });
+      if (!res.ok) throw new Error("Failed to fetch adjacent posts");
+      return AdjacentPostsSchema.parse(await res.json());
     },
   });
 }

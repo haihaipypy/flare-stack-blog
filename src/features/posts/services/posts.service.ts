@@ -6,6 +6,7 @@ import * as PostRevisionRepo from "@/features/posts/data/post-revisions.data";
 import * as PostRepo from "@/features/posts/data/posts.data";
 import type {
   DeletePostInput,
+  FindAdjacentPostsInput,
   FindPostByIdInput,
   FindPostBySlugInput,
   FindRelatedPostsInput,
@@ -18,6 +19,7 @@ import type {
   UpdatePostInput,
 } from "@/features/posts/schema/posts.schema";
 import {
+  AdjacentPostsSchema,
   normalizePostTagName,
   POSTS_CACHE_KEYS,
   PostItemSchema,
@@ -170,6 +172,25 @@ export async function getRelatedPosts(
     .filter((p): p is NonNullable<typeof p> => !!p);
 
   return orderedPosts;
+}
+
+/**
+ * 文章详情页的"上一篇 / 下一篇"：按发布时间相邻的两篇。
+ * 与相关文章一样走 KV 缓存，但这里缓存的是最终结果（含标题），
+ * 并用 posts:list 的版本号做键，保证新文章发布后立刻反映出来。
+ */
+export async function getAdjacentPosts(
+  context: DbContext & { executionCtx: ExecutionContext },
+  data: FindAdjacentPostsInput,
+) {
+  return await CacheService.getVersioned(
+    context,
+    "posts:list",
+    (version) => POSTS_CACHE_KEYS.adjacent(`${version}:${data.slug}`),
+    AdjacentPostsSchema,
+    () => PostRepo.findAdjacentPublicPosts(context.db, data.slug),
+    { ttl: "7d" },
+  );
 }
 
 export async function generateSummaryByPostId({

@@ -2,14 +2,13 @@ import type { NodeViewProps } from "@tiptap/react";
 import { NodeViewContent, NodeViewWrapper } from "@tiptap/react";
 import { Check, Copy } from "lucide-react";
 import { useEffect, useState } from "react";
-import DropdownMenu from "@/components/ui/dropdown-menu";
 import {
   getHighlighter,
   loadLanguage,
   themes as shikiThemes,
 } from "@/lib/shiki";
 import { m } from "@/paraglide/messages";
-import { getLanguages } from "./languages";
+import { LanguagePicker } from "./language-picker";
 
 export function CodeBlockView({
   node,
@@ -19,7 +18,6 @@ export function CodeBlockView({
   const [copied, setCopied] = useState(false);
   const [themeStyles, setThemeStyles] = useState<React.CSSProperties>({});
   const language = node.attrs.language || "text";
-  const languages = getLanguages();
 
   useEffect(() => {
     let mounted = true;
@@ -66,16 +64,10 @@ export function CodeBlockView({
         {/* Minimal Header */}
         <div className="flex items-center justify-between px-4 py-2 border-b border-zinc-200/10 dark:border-zinc-800/10 bg-zinc-100 dark:bg-zinc-800 select-none rounded-t-sm">
           <div className="flex items-center gap-4">
-            <span className="text-xs font-mono font-medium text-muted-foreground/80">
-              <DropdownMenu
-                value={language}
-                onChange={(val) => updateAttributes({ language: val })}
-                options={languages.map((lang) => ({
-                  label: lang.label,
-                  value: lang.value,
-                }))}
-              />
-            </span>
+            <LanguagePicker
+              value={language}
+              onChange={(val) => updateAttributes({ language: val })}
+            />
           </div>
 
           <button
