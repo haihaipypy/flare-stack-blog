@@ -85,7 +85,7 @@ export function Footer(_: FooterProps) {
               rel="noreferrer"
               className="hover:opacity-80"
             >
-              Flare Stack Blog
+              无辣的学习笔记
             </a>
           </span>
         </div>
