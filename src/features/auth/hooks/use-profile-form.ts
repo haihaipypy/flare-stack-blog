@@ -17,7 +17,7 @@ const createProfileSchema = (messages: Messages) =>
       .union([
         z.literal(""),
         z.string().url(messages.profile_validation_avatar_invalid()).trim(),
-        // Allow local avatar-library paths like /avatars/person-1.svg
+        // Allow local generated-avatar paths like /avatar/<seed>
         z
           .string()
           .regex(/^\//, messages.profile_validation_avatar_invalid())

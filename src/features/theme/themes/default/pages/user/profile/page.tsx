@@ -2,6 +2,10 @@ import { Link } from "@tanstack/react-router";
 import { Loader2, Terminal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  avatarSeedForUser,
+  buildAvatarUrl,
+} from "@/features/avatar/avatar.url";
 import type { ProfilePageProps } from "@/features/theme/contract/pages";
 import { cn } from "@/lib/utils";
 import { m } from "@/paraglide/messages";
@@ -47,17 +51,11 @@ export function ProfilePage({
           className="w-24 h-24 rounded-full overflow-hidden border border-border bg-muted/30 relative"
           style={{ viewTransitionName: "user-avatar" }}
         >
-          {user.image ? (
-            <img
-              src={user.image}
-              alt={user.name}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-muted-foreground font-serif text-3xl">
-              {user.name.charAt(0).toUpperCase()}
-            </div>
-          )}
+          <img
+            src={user.image || buildAvatarUrl(avatarSeedForUser(user))}
+            alt={user.name}
+            className="w-full h-full object-cover"
+          />
         </div>
 
         <div className="space-y-2">

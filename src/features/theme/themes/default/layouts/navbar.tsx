@@ -1,8 +1,12 @@
 import { Link, useRouteContext } from "@tanstack/react-router";
-import { Search, UserIcon } from "lucide-react";
+import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { ThemeToggle } from "@/components/common/theme-toggle";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  avatarSeedForUser,
+  buildAvatarUrl,
+} from "@/features/avatar/avatar.url";
 import type { NavOption, UserInfo } from "@/features/theme/contract/layouts";
 import { m } from "@/paraglide/messages";
 import { LanguageSwitcher } from "./language-switcher";
@@ -96,20 +100,14 @@ export function Navbar({
                           className="w-7 h-7 rounded-full overflow-hidden ring-1 ring-border hover:ring-foreground transition-all relative z-10"
                           style={{ viewTransitionName: "user-avatar" }}
                         >
-                          {user.image ? (
-                            <img
-                              src={user.image}
-                              alt={user.name}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-muted flex items-center justify-center">
-                              <UserIcon
-                                size={12}
-                                className="text-muted-foreground"
-                              />
-                            </div>
-                          )}
+                          <img
+                            src={
+                              user.image ||
+                              buildAvatarUrl(avatarSeedForUser(user))
+                            }
+                            alt={user.name}
+                            className="w-full h-full object-cover"
+                          />
                         </Link>
                       </>
                     ) : (

@@ -4,6 +4,10 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import {
+  avatarSeedForUser,
+  buildAvatarUrl,
+} from "@/features/avatar/avatar.url";
 import { getUserStatsFn } from "@/features/comments/api/comments.admin.api";
 import { COMMENTS_KEYS } from "@/features/comments/queries";
 import { formatDate } from "@/lib/utils";
@@ -51,17 +55,11 @@ export function UserHoverCard({ user, children }: UserHoverCardProps) {
               </p>
             </div>
             <div className="w-14 h-14 border border-border transition-all duration-700 bg-muted">
-              {user.image ? (
-                <img
-                  src={user.image}
-                  className="w-full h-full object-cover"
-                  alt={user.name}
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center font-mono text-xs">
-                  {user.name.slice(0, 1)}
-                </div>
-              )}
+              <img
+                src={user.image || buildAvatarUrl(avatarSeedForUser(user))}
+                className="w-full h-full object-cover"
+                alt={user.name}
+              />
             </div>
           </div>
 

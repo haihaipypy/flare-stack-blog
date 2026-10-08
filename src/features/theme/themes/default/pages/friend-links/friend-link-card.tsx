@@ -1,3 +1,7 @@
+import {
+  avatarSeedForFriendLink,
+  buildAvatarUrl,
+} from "@/features/avatar/avatar.url";
 import type { FriendLinkWithUser } from "@/features/friend-links/friend-links.schema";
 
 interface FriendLinkCardProps {
@@ -10,6 +14,9 @@ export function FriendLinkCard({ link }: FriendLinkCardProps) {
     .replace(/^https?:\/\//, "")
     .replace(/\/$/, "");
 
+  // 没有站点 logo 时按域名生成一张稳定头像，替代原来的首字母占位
+  const logoUrl = link.logoUrl || buildAvatarUrl(avatarSeedForFriendLink(link));
+
   return (
     <a
       href={link.siteUrl}
@@ -19,18 +26,12 @@ export function FriendLinkCard({ link }: FriendLinkCardProps) {
     >
       {/* Logo */}
       <div className="shrink-0 w-10 h-10 rounded-md bg-muted/30 border border-border/40 flex items-center justify-center overflow-hidden">
-        {link.logoUrl ? (
-          <img
-            src={link.logoUrl}
-            alt={link.siteName}
-            className="w-full h-full object-cover transition-all duration-300"
-            loading="lazy"
-          />
-        ) : (
-          <span className="text-sm font-serif font-medium text-muted-foreground/60">
-            {link.siteName.slice(0, 1)}
-          </span>
-        )}
+        <img
+          src={logoUrl}
+          alt={link.siteName}
+          className="w-full h-full object-cover transition-all duration-300"
+          loading="lazy"
+        />
       </div>
 
       <div className="flex-1 min-w-0 space-y-1">

@@ -1,7 +1,22 @@
 import { Link } from "@tanstack/react-router";
-import { CodeSquare, Loader2, LogOut, Settings2, Shield } from "lucide-react";
+import {
+  CodeSquare,
+  Loader2,
+  LogOut,
+  RefreshCw,
+  Settings2,
+  Shield,
+} from "lucide-react";
+import { useMemo, useState } from "react";
+import {
+  AVATAR_PICKER_BATCH_SIZE,
+  buildAvatarSeedBatch,
+} from "@/features/avatar/avatar.batch";
+import {
+  avatarSeedForUser,
+  buildAvatarUrl,
+} from "@/features/avatar/avatar.url";
 import type { ProfilePageProps } from "@/features/theme/contract/pages";
-import { avatarLibrary } from "@/features/theme/themes/fuwari/avatar-library";
 import { cn } from "@/lib/utils";
 import { m } from "@/paraglide/messages";
 
@@ -19,6 +34,19 @@ export function ProfilePage({
 
   const currentImage = profileForm.watch("image");
 
+  // 生成式头像批次。
+  // 初始批次由用户身份 + 轮次决定，因此服务端与客户端会算出完全相同的结果，
+  // 不会出现 hydration mismatch；点「换一批」只递增轮次即可换一整屏。
+  const [shuffleRound, setShuffleRound] = useState(0);
+  const avatarSeeds = useMemo(
+    () =>
+      buildAvatarSeedBatch(
+        `${user.email ?? user.name}#${shuffleRound}`,
+        AVATAR_PICKER_BATCH_SIZE,
+      ),
+    [user.email, user.name, shuffleRound],
+  );
+
   return (
     <div className="flex flex-col gap-6 w-full max-w-4xl mx-auto pb-12">
       {/* Header Profile Section */}
@@ -30,17 +58,11 @@ export function ProfilePage({
           className="w-24 h-24 rounded-full overflow-hidden border-4 border-white dark:border-(--fuwari-card-bg) bg-(--fuwari-btn-regular-bg) shadow-md relative mb-4"
           style={{ viewTransitionName: "user-avatar" }}
         >
-          {user.image ? (
-            <img
-              src={user.image}
-              alt={user.name}
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center text-(--fuwari-btn-content) font-bold text-3xl">
-              {user.name.charAt(0).toUpperCase()}
-            </div>
-          )}
+          <img
+            src={user.image || buildAvatarUrl(avatarSeedForUser(user))}
+            alt={user.name}
+            className="w-full h-full object-cover"
+          />
         </div>
 
         <h1 className="text-2xl font-bold fuwari-text-90 mb-2 transition-colors">
@@ -105,20 +127,30 @@ export function ProfilePage({
 
               {/* Avatar library */}
               <div className="mt-3">
-                <p className={labelClassName}>{m.profile_avatar_library()}</p>
+                <div className="flex items-center justify-between gap-3">
+                  <p className={labelClassName}>{m.profile_avatar_library()}</p>
+                  <button
+                    type="button"
+                    onClick={() => setShuffleRound((round) => round + 1)}
+                    className="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-lg text-(--fuwari-btn-content) hover:text-(--fuwari-primary) hover:bg-(--fuwari-btn-plain-bg-hover) transition-colors active:scale-95"
+                  >
+                    <RefreshCw className="w-3.5 h-3.5" />
+                    {m.profile_avatar_shuffle()}
+                  </button>
+                </div>
                 <p className="text-xs text-(--fuwari-btn-content) mb-2">
                   {m.profile_avatar_library_desc()}
                 </p>
                 <div className="grid grid-cols-6 gap-2">
-                  {avatarLibrary.map((avatar) => {
-                    const selected = currentImage === avatar.src;
+                  {avatarSeeds.map((seed) => {
+                    const src = buildAvatarUrl(seed);
+                    const selected = currentImage === src;
                     return (
                       <button
-                        key={avatar.src}
+                        key={seed}
                         type="button"
-                        title={avatar.label}
                         onClick={() =>
-                          profileForm.setValue("image", avatar.src, {
+                          profileForm.setValue("image", src, {
                             shouldDirty: true,
                           })
                         }
@@ -130,8 +162,8 @@ export function ProfilePage({
                         )}
                       >
                         <img
-                          src={avatar.src}
-                          alt={avatar.label}
+                          src={src}
+                          alt=""
                           className="w-full h-full object-cover"
                         />
                       </button>

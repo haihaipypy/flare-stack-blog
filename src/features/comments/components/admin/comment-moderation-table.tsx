@@ -7,6 +7,10 @@ import { toast } from "sonner";
 import { AdminPagination } from "@/components/admin/admin-pagination";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+  avatarSeedForUser,
+  buildAvatarUrl,
+} from "@/features/avatar/avatar.url";
 import { ExpandableContent } from "@/features/theme/themes/default/components/comments/view/expandable-content";
 import type { CommentStatus } from "@/lib/db/schema";
 import { formatDate } from "@/lib/utils";
@@ -235,17 +239,14 @@ export const CommentModerationTable = ({
                   >
                     <div className="flex items-center gap-3 cursor-pointer group/user overflow-hidden">
                       <div className="w-8 h-8 rounded-none bg-muted/20 flex items-center justify-center border border-border/30 shrink-0">
-                        {comment.user.image ? (
-                          <img
-                            src={comment.user.image}
-                            className="w-full h-full object-cover"
-                            alt={comment.user.name}
-                          />
-                        ) : (
-                          <span className="text-[10px] font-mono">
-                            {comment.user.name.slice(0, 1)}
-                          </span>
-                        )}
+                        <img
+                          src={
+                            comment.user.image ||
+                            buildAvatarUrl(avatarSeedForUser(comment.user))
+                          }
+                          className="w-full h-full object-cover"
+                          alt={comment.user.name}
+                        />
                       </div>
                       <div className="min-w-0 space-y-0.5">
                         <div className="text-xs font-serif font-medium truncate group-hover/user:text-foreground transition-colors">
@@ -351,16 +352,14 @@ export const CommentModerationTable = ({
                   />
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-none bg-muted flex items-center justify-center border border-border shrink-0">
-                      {comment.user?.image ? (
-                        <img
-                          src={comment.user.image}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-[10px] font-mono">
-                          {comment.user?.name.slice(0, 1)}
-                        </span>
-                      )}
+                      <img
+                        src={
+                          comment.user?.image ||
+                          buildAvatarUrl(avatarSeedForUser(comment.user))
+                        }
+                        className="w-full h-full object-cover"
+                        alt={comment.user?.name ?? ""}
+                      />
                     </div>
                     <div>
                       <div className="text-xs font-bold font-serif tracking-tight">

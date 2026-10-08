@@ -1,4 +1,8 @@
 import { ExternalLink, Globe } from "lucide-react";
+import {
+  avatarSeedForFriendLink,
+  buildAvatarUrl,
+} from "@/features/avatar/avatar.url";
 import type { FriendLinkWithUser } from "@/features/friend-links/friend-links.schema";
 import { cn } from "@/lib/utils";
 import { m } from "@/paraglide/messages";
@@ -10,7 +14,11 @@ interface FriendCardProps {
 }
 
 export function FriendCard({ link, className, style }: FriendCardProps) {
-  const avatarUrl = link.logoUrl || link.user?.image;
+  // 没有站点 logo 时不再显示一个灰地球，而是按域名生成一张稳定的头像
+  const avatarUrl =
+    link.logoUrl ||
+    link.user?.image ||
+    buildAvatarUrl(avatarSeedForFriendLink(link));
   const description = link.description || m.friend_links_unknown_site();
 
   return (
@@ -28,23 +36,17 @@ export function FriendCard({ link, className, style }: FriendCardProps) {
       <div className="flex items-center gap-4">
         {/* Avatar Area */}
         <div className="shrink-0 relative w-16 h-16 rounded-2xl overflow-hidden bg-black/5 dark:bg-white/5 flex items-center justify-center border border-black/5 dark:border-white/5 transition-transform duration-300 group-hover:scale-105">
-          {avatarUrl ? (
-            <img
-              src={avatarUrl}
-              alt={link.siteName}
-              className="w-full h-full object-cover transition-opacity duration-300"
-              loading="lazy"
-              onError={(e) => {
-                // Fallback icon on image load failure by hiding image and showing the background icon conceptually
-                e.currentTarget.style.display = "none";
-                e.currentTarget.parentElement?.classList.add(
-                  "!bg-(--fuwari-btn-regular-bg)",
-                );
-              }}
-            />
-          ) : (
-            <Globe className="w-8 h-8 opacity-40" />
-          )}
+          <Globe className="absolute w-8 h-8 opacity-40" />
+          <img
+            src={avatarUrl}
+            alt={link.siteName}
+            className="relative w-full h-full object-cover transition-opacity duration-300"
+            loading="lazy"
+            onError={(e) => {
+              // 图片加载失败时隐藏它，露出底层的 Globe 占位图标
+              e.currentTarget.style.display = "none";
+            }}
+          />
         </div>
 
         {/* Content Area */}

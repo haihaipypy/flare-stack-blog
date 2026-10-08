@@ -2,6 +2,7 @@ import handler from "@tanstack/react-start/server-entry";
 import type { Context } from "hono";
 import { Hono } from "hono";
 import { proxy } from "hono/proxy";
+import avatarRoute from "@/features/avatar/api/hono/avatar.route";
 import categoriesRoute from "@/features/categories/api/hono/categories.list.route";
 import { exportDownloadRoute } from "@/features/import-export/api/hono/download.route";
 import { handleImageRequest } from "@/features/media/service/media.service";
@@ -101,6 +102,10 @@ app.get("/images/:key{.+}", async (c) => {
     return c.text("Internal server error", 500);
   }
 });
+
+// 生成式头像（DiceBear）。注册在 shieldMiddleware 之前，
+// 因此不受 path-manifest 的白名单限制（与 /images/:key 同理）。
+app.route("/avatar", avatarRoute);
 
 app.get("/api/auth/*", baseMiddleware, forwardAuthRequest);
 

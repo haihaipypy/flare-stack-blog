@@ -1,6 +1,10 @@
 import { ClientOnly } from "@tanstack/react-router";
 import { memo, useMemo } from "react";
 import { Button } from "@/components/ui/button";
+import {
+  avatarSeedForUser,
+  buildAvatarUrl,
+} from "@/features/avatar/avatar.url";
 import type { CommentWithUser } from "@/features/comments/comments.schema";
 import { authClient } from "@/lib/auth/auth.client";
 import { cn, formatDate } from "@/lib/utils";
@@ -71,16 +75,16 @@ export const CommentItem = memo(
               <span className="text-[9px] font-mono text-muted-foreground uppercase opacity-30">
                 X
               </span>
-            ) : comment.user?.image ? (
-              <img
-                src={comment.user.image}
-                alt={comment.user.name ?? m.comments_item_anonymous()}
-                className="w-full h-full object-cover"
-              />
             ) : (
-              <span className="text-[10px] font-mono text-muted-foreground uppercase">
-                {comment.user?.name?.slice(0, 1) || "?"}
-              </span>
+              <img
+                src={
+                  comment.user?.image ||
+                  buildAvatarUrl(avatarSeedForUser(comment.user))
+                }
+                alt={comment.user?.name ?? m.comments_item_anonymous()}
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
             )}
           </div>
         </div>

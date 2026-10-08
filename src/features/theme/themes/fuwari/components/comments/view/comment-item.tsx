@@ -1,5 +1,9 @@
 import { ClientOnly } from "@tanstack/react-router";
 import { memo, useMemo } from "react";
+import {
+  avatarSeedForUser,
+  buildAvatarUrl,
+} from "@/features/avatar/avatar.url";
 import type { CommentWithUser } from "@/features/comments/comments.schema";
 import { authClient } from "@/lib/auth/auth.client";
 import { cn, formatDate } from "@/lib/utils";
@@ -69,16 +73,16 @@ export const FuwariCommentItem = memo(
           <div className="w-9 h-9 rounded-full bg-black/5 dark:bg-white/10 overflow-hidden flex items-center justify-center transition">
             {comment.status === "deleted" ? (
               <span className="text-xs fuwari-text-30">✕</span>
-            ) : comment.user?.image ? (
-              <img
-                src={comment.user.image}
-                alt={comment.user.name ?? m.comments_item_anonymous()}
-                className="w-full h-full object-cover"
-              />
             ) : (
-              <span className="text-sm font-medium fuwari-text-50">
-                {comment.user?.name?.slice(0, 1) || "?"}
-              </span>
+              <img
+                src={
+                  comment.user?.image ||
+                  buildAvatarUrl(avatarSeedForUser(comment.user))
+                }
+                alt={comment.user?.name ?? m.comments_item_anonymous()}
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
             )}
           </div>
         </div>

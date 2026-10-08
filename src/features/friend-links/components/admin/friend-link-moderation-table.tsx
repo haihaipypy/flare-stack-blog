@@ -18,6 +18,11 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import ConfirmationModal from "@/components/ui/confirmation-modal";
 import { Input } from "@/components/ui/input";
+import {
+  avatarSeedForFriendLink,
+  avatarSeedForUser,
+  buildAvatarUrl,
+} from "@/features/avatar/avatar.url";
 import type { FriendLinkStatus } from "@/lib/db/schema";
 import { formatDate } from "@/lib/utils";
 import { m } from "@/paraglide/messages";
@@ -228,16 +233,18 @@ export const FriendLinkModerationTable = ({
               <div className="col-span-2 space-y-3">
                 <div className="flex items-center gap-3 overflow-hidden">
                   <div className="w-8 h-8 rounded-none bg-muted/20 flex items-center justify-center border border-border/30 shrink-0">
-                    {item.user?.image ? (
-                      <img
-                        src={item.user.image}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-[10px] font-mono">
-                        {item.user?.name.slice(0, 1) || "A"}
-                      </span>
-                    )}
+                    <img
+                      src={
+                        item.user?.image ||
+                        buildAvatarUrl(
+                          item.user
+                            ? avatarSeedForUser(item.user)
+                            : avatarSeedForFriendLink(item),
+                        )
+                      }
+                      className="w-full h-full object-cover"
+                      alt={item.user?.name ?? item.siteName}
+                    />
                   </div>
                   <div className="min-w-0 space-y-0.5">
                     <div className="text-xs font-serif font-medium truncate">
@@ -326,16 +333,18 @@ export const FriendLinkModerationTable = ({
                   />
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-none bg-muted flex items-center justify-center border border-border shrink-0">
-                      {item.user?.image ? (
-                        <img
-                          src={item.user.image}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-[10px] font-mono">
-                          {item.user?.name.slice(0, 1) || "A"}
-                        </span>
-                      )}
+                      <img
+                        src={
+                          item.user?.image ||
+                          buildAvatarUrl(
+                            item.user
+                              ? avatarSeedForUser(item.user)
+                              : avatarSeedForFriendLink(item),
+                          )
+                        }
+                        className="w-full h-full object-cover"
+                        alt={item.user?.name ?? item.siteName}
+                      />
                     </div>
                     <div>
                       <div className="text-xs font-bold font-serif tracking-tight">
