@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { Server } from "lucide-react";
 import { m } from "@/paraglide/messages";
 import { activeOffers, DEFAULT_AFFILIATE_CONFIG } from "../affiliate.defaults";
 import {
@@ -69,11 +68,6 @@ function AdTag() {
 function AffiliateEnvironment({ offers }: { offers: AffiliateOffer[] }) {
   return (
     <div className="affiliate-block">
-      <div className="affiliate-block__head">
-        <Server aria-hidden size={16} strokeWidth={1.75} />
-        <span>{m.affiliate_env_title()}</span>
-      </div>
-
       <div className="affiliate-grid">
         {offers.map((offer) => (
           <a
