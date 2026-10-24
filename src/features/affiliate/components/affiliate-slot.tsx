@@ -32,9 +32,10 @@ export function AffiliateSlot({ slot, seed }: AffiliateSlotProps) {
       ? pickOffers(config.excludeSlot, seed)
       : [];
 
-  const offers = pickOffers(slot, seed, exclude)
-    .map((slug) => affiliateOffers[slug])
-    .filter((offer): offer is AffiliateOffer => Boolean(offer));
+  // pickOffers 只返回配置表里存在的 slug，直接取值即可，不存在取不到的情况
+  const offers: AffiliateOffer[] = pickOffers(slot, seed, exclude).map(
+    (slug) => affiliateOffers[slug],
+  );
 
   if (offers.length === 0) return null;
 

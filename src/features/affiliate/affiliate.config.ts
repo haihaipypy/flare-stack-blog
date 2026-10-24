@@ -1,8 +1,8 @@
 /**
  * 推广位配置表（单一事实来源）
  *
- * 文章正文里只需要写占位符 [[offer:slug]] 或 [[env:preset]]，
- * 真正的推广链接集中在这里维护 —— 厂商换链接时只改本文件，不用回头改历史文章。
+ * 广告位由模板固定（见 affiliate.slots.ts），真正的推广链接集中在这里维护 ——
+ * 厂商换链接时只改本文件，不用回头改历史文章。
  *
  * 合规约定：
  * - 卡片上不出现「返佣 / 返利 / 返现」字样，只描述读者能得到什么。
@@ -11,9 +11,8 @@
 
 export type AffiliateProvider = "aliyun" | "tencent";
 
-export interface AffiliateOffer {
-  /** 短链标识，同时是 /go/:slug 的 slug */
-  slug: string;
+/** 推广位元信息。slug 不在这里定 —— 它由配置表的键推导，见下方 AffiliateOffer。 */
+export interface AffiliateOfferMeta {
   provider: AffiliateProvider;
   /** 平台展示名 */
   providerName: string;
@@ -82,9 +81,15 @@ export const affiliateOffers = {
     url: "https://cloud.tencent.com/act/cps/redirect?redirect=2446&cps_key=76a98775becf95bc2d3226a56d7a9b8c",
     tags: ["general", "storage", "database"],
   },
-} as const satisfies Record<string, AffiliateOffer>;
+} as const satisfies Record<string, AffiliateOfferMeta & { slug: string }>;
 
 export type AffiliateSlug = keyof typeof affiliateOffers;
+
+/**
+ * 对外的推广位完整类型：slug 收敛为联合类型（而不是 string），
+ * 这样拿它去查表、拼 /go/:slug 都能被类型系统校验。
+ */
+export type AffiliateOffer = AffiliateOfferMeta & { slug: AffiliateSlug };
 
 export const affiliateSlugs = Object.keys(affiliateOffers) as AffiliateSlug[];
 
