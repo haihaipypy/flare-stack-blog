@@ -25,3 +25,5 @@ docs/superpowers/
 # agent local state
 .omo/
 .opencode-lark/
+# 工具删除文件时的本地回收站
+.Trash-*/

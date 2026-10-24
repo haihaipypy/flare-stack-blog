@@ -2,6 +2,7 @@ import handler from "@tanstack/react-start/server-entry";
 import type { Context } from "hono";
 import { Hono } from "hono";
 import { proxy } from "hono/proxy";
+import affiliateRoute from "@/features/affiliate/api/hono/affiliate.route";
 import avatarRoute from "@/features/avatar/api/hono/avatar.route";
 import categoriesRoute from "@/features/categories/api/hono/categories.list.route";
 import { exportDownloadRoute } from "@/features/import-export/api/hono/download.route";
@@ -106,6 +107,10 @@ app.get("/images/:key{.+}", async (c) => {
 // 生成式头像（DiceBear）。注册在 shieldMiddleware 之前，
 // 因此不受 path-manifest 的白名单限制（与 /images/:key 同理）。
 app.route("/avatar", avatarRoute);
+
+// 推广短链：/go/:slug → 302 厂商活动页（同时记录点击）。
+// 同样放在 shieldMiddleware 之前，否则会被 path-manifest 拦掉。
+app.route("/go", affiliateRoute);
 
 app.get("/api/auth/*", baseMiddleware, forwardAuthRequest);
 

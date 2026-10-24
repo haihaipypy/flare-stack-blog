@@ -1,3 +1,4 @@
+import { AffiliateSlot } from "@/features/affiliate/components/affiliate-slot";
 import type { ToolsPageProps } from "@/features/theme/contract/pages";
 
 export function ToolsPage({
@@ -7,6 +8,9 @@ export function ToolsPage({
 }: ToolsPageProps & { title: string; description: string; content: string }) {
   return (
     <div className="w-full max-w-6xl mx-auto pt-8 md:pt-12 pb-20 px-6 md:px-4">
+      {/* 广告位：工具页顶部横幅 */}
+      <AffiliateSlot seed="tools" slot="tools-banner" />
+
       <div className="min-h-[400px]">
         {content && content.trim() !== "" ? (
           <div className="p-8 prose prose-sm max-w-none">

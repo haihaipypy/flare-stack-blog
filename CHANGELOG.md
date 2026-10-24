@@ -8,6 +8,10 @@
 
 ## 2026-10
 
+### 移除
+
+- **移除 Google AdSense**：不再向公开页面注入 `adsbygoogle.js` 脚本，删除 `public/ads.txt` 校验文件。广告位改由后续接入的联盟方案承担
+
 ### 新增
 
 - **移植上游 v3.2.0 第一梯队功能**
@@ -19,6 +23,12 @@
   - **Mermaid 图表渲染**：`mermaid` 代码块直接渲染流程图/时序图，主题色分 `fuwari`(oklch) 与 `default`(hsl) 两套 token，经 `OffscreenCanvas` 转 hex 注入 Mermaid base 主题；渲染失败时保留源码兜底
   - 代码块语言徽章改用统一注册表，支持全部 67 种语言
 - MCP 新增 `system_reset_cache` 工具，可一键重置全站缓存
+- **广告位（affiliate）**
+  - 位置写在模板里，**历史文章自动生效**，发文不需要任何额外操作：文章正文上方「本文环境」、文末横幅、工具页顶部横幅
+  - 每个位置由文章 slug 做**确定性随机**挑选推广位（刷新不变、SSR 与 hydration 一致），文末位自动避开正文上方已选中的那条
+  - 推广链接集中在 `src/features/affiliate/affiliate.config.ts`，换链接不必回头改历史文章
+  - 所有外链统一走 `/go/:slug` 302 中转，带 `rel="sponsored nofollow"`、披露文案与「广告」标识
+  - 新增 `affiliate_clicks` 表，记录每次点击的广告位、来源文章与两位国家码（不存 IP / UA）
 
 ### 修复
 

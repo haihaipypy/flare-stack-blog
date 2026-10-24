@@ -23,3 +23,163 @@
     text-decoration: var(--shiki-dark-text-decoration) !important;
   }
 }
+
+/* ============================ 推广卡片 ============================
+ * 两套主题共用一套样式，因此不引用 --muted / --border 这类
+ * 只有 default 主题才有的变量，也不引用 --fuwari-* 这类只有 fuwari 才有的变量。
+ * 底色、描边全部由 currentColor 混合出来，明暗主题自动适配。
+ */
+@layer components {
+  .affiliate-block {
+    --aff-accent: var(--fuwari-primary, hsl(var(--primary, 240 5% 10%)));
+    display: block;
+    margin: 1.75rem 0;
+    padding: 1rem 1.1rem 0.9rem;
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 0.9rem;
+    background: color-mix(in srgb, currentColor 3.5%, transparent);
+  }
+
+  .affiliate-block--plain {
+    margin: 1.25rem 0;
+    padding: 0;
+    border: 0;
+    background: none;
+  }
+
+  /* 「广告」标识：中国《互联网广告管理办法》要求广告可识别，必须有 */
+  .affiliate-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.05rem 0.32rem;
+    border: 1px solid color-mix(in srgb, currentColor 28%, transparent);
+    border-radius: 0.25rem;
+    font-size: 0.625rem;
+    line-height: 1.5;
+    letter-spacing: 0.05em;
+    opacity: 0.55;
+    flex-shrink: 0;
+  }
+
+  /* 横向横幅：文末 / 工具页顶部 */
+  a.affiliate-banner {
+    --aff-accent: var(--fuwari-primary, hsl(var(--primary, 240 5% 10%)));
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 1.5rem 0;
+    padding: 0.8rem 1rem;
+    border: 1px solid color-mix(in srgb, currentColor 12%, transparent);
+    border-radius: 0.8rem;
+    background: color-mix(in srgb, currentColor 3.5%, transparent);
+    color: inherit;
+    text-decoration: none;
+    transition:
+      border-color 0.2s,
+      background-color 0.2s;
+  }
+
+  a.affiliate-banner:hover {
+    border-color: color-mix(in srgb, var(--aff-accent) 55%, transparent);
+    background: color-mix(in srgb, currentColor 5.5%, transparent);
+  }
+
+  .affiliate-banner__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .affiliate-banner__title {
+    font-size: 0.9rem;
+    font-weight: 600;
+    line-height: 1.4;
+  }
+
+  .affiliate-banner__perk {
+    font-size: 0.78rem;
+    line-height: 1.45;
+    opacity: 0.62;
+  }
+
+  .affiliate-banner__cta {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--aff-accent);
+    white-space: nowrap;
+  }
+
+  .affiliate-block__head {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-bottom: 0.7rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    opacity: 0.6;
+  }
+
+  .affiliate-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+    gap: 0.6rem;
+  }
+
+  .affiliate-block a.affiliate-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.16rem;
+    padding: 0.75rem 0.85rem;
+    border: 1px solid color-mix(in srgb, currentColor 14%, transparent);
+    border-radius: 0.7rem;
+    background: color-mix(in srgb, currentColor 2%, transparent);
+    color: inherit;
+    text-decoration: none;
+    transition:
+      border-color 0.2s,
+      background-color 0.2s,
+      transform 0.2s;
+  }
+
+  .affiliate-block a.affiliate-card:hover {
+    border-color: color-mix(in srgb, var(--aff-accent) 65%, transparent);
+    background: color-mix(in srgb, currentColor 5%, transparent);
+    transform: translateY(-1px);
+  }
+
+  .affiliate-card__provider {
+    font-size: 0.7rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.5;
+  }
+
+  .affiliate-card__title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.35;
+  }
+
+  .affiliate-card__perk {
+    font-size: 0.8rem;
+    line-height: 1.45;
+    opacity: 0.7;
+  }
+
+  .affiliate-card__cta {
+    margin-top: 0.35rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--aff-accent);
+  }
+
+  .affiliate-block p.affiliate-block__note {
+    margin: 0.7rem 0 0;
+    font-size: 0.72rem;
+    line-height: 1.5;
+    opacity: 0.45;
+  }
+}

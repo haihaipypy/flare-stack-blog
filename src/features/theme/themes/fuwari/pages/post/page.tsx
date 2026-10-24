@@ -1,12 +1,16 @@
 import { Link } from "@tanstack/react-router";
 import { Clock, FileText, Pencil } from "lucide-react";
 import { Suspense } from "react";
+import { AffiliateSlot } from "@/features/affiliate/components/affiliate-slot";
 import type { PostPageProps } from "@/features/theme/contract/pages";
 import { FuwariCommentSection } from "@/features/theme/themes/fuwari/components/comments/view/comment-section";
 import { ContentRenderer } from "@/features/theme/themes/fuwari/components/content/content-renderer";
 import { authClient } from "@/lib/auth/auth.client";
 import { m } from "@/paraglide/messages";
-import { PostAdjacentNav, PostAdjacentNavSkeleton } from "./components/post-adjacent-nav";
+import {
+  PostAdjacentNav,
+  PostAdjacentNavSkeleton,
+} from "./components/post-adjacent-nav";
 import { PostMeta } from "./components/post-meta";
 import { PostSummary } from "./components/post-summary";
 import { RelatedPosts, RelatedPostsSkeleton } from "./components/related-posts";
@@ -86,6 +90,9 @@ export function PostPage({ post }: PostPageProps) {
         {/* Summary */}
         <PostSummary summary={post.summary} />
 
+        {/* 广告位：正文上方（位置写死在模板里，历史文章同样生效） */}
+        <AffiliateSlot seed={post.slug} slot="post-top" />
+
         {/* Markdown Content */}
         <div className="mb-6 prose dark:prose-invert prose-base max-w-none! fuwari-custom-md">
           <ContentRenderer content={post.contentJson} />
@@ -99,6 +106,9 @@ export function PostPage({ post }: PostPageProps) {
           </span>
           <div className="h-px w-full bg-linear-to-r from-(--fuwari-meta-divider) via-transparent to-transparent opacity-20" />
         </div>
+
+        {/* 广告位：文末 */}
+        <AffiliateSlot seed={post.slug} slot="post-bottom" />
       </div>
 
       {/* 上一篇 / 下一篇（按发布时间相邻） */}

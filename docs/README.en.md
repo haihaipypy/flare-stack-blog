@@ -58,9 +58,9 @@ Deeply integrated with D1, R2, KV, Workflows, Queues and other Serverless servic
 
 - **SEO Enhancements** — Canonical URLs, Schema.org structured data (BlogPosting), OG images, RSS / Sitemap / Robots.
 - **Baidu Active Push** — Newly published post URLs are pushed to Baidu's "普通收录" channel to shorten indexing time.
-- **Advertising** — Google AdSense integration with an `ads.txt` verification file.
 - **Site Documents** — Standalone pages for About, Privacy Policy and Terms of Service, reachable from the top navigation.
 - **Tools Page** — A dedicated `/tools` page whose title, description and content are editable from the admin panel.
+- **Affiliate Slots** — Fixed slots in the post template (above and below the content) plus the tools page, assigned deterministically per post, routed through `/go/:slug` with click tracking.
 
 ### Platform Capabilities
 

@@ -3,6 +3,7 @@ import { ArrowLeft, ArrowUp, Pencil, Share2, Sparkles } from "lucide-react";
 import { Suspense, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
+import { AffiliateSlot } from "@/features/affiliate/components/affiliate-slot";
 import type { PostPageProps } from "@/features/theme/contract/pages";
 import { ContentRenderer } from "@/features/theme/themes/default/components/content/content-renderer";
 import { authClient } from "@/lib/auth/auth.client";
@@ -124,7 +125,13 @@ export function PostPage({ post }: PostPageProps) {
           </aside>
 
           <main className="max-w-none text-foreground leading-relaxed font-serif">
+            {/* 广告位：正文上方（位置写死在模板里，历史文章同样生效） */}
+            <AffiliateSlot seed={post.slug} slot="post-top" />
+
             <ContentRenderer content={post.contentJson} />
+
+            {/* 广告位：文末 */}
+            <AffiliateSlot seed={post.slug} slot="post-bottom" />
 
             <footer className="mt-24 pt-8 border-t border-border/20 flex flex-col md:flex-row justify-between items-center gap-6">
               <div className="flex items-center gap-4 text-xs font-mono text-muted-foreground/60 tracking-widest uppercase">
