@@ -29,6 +29,8 @@
   - 推广链接集中在 `src/features/affiliate/affiliate.config.ts`，换链接不必回头改历史文章
   - 所有外链统一走 `/go/:slug` 302 中转，带 `rel="sponsored nofollow"`、披露文案与「广告」标识
   - 新增 `affiliate_clicks` 表，记录每次点击的广告位、来源文章与两位国家码（不存 IP / UA）
+  - **站外嵌入**：`/embed/float.js` 一套自包含悬浮脚本，其他网站插一行 `<script data-aff-float>` 即可显示广告；脚本只含 slug，点击一律回流 `/go/:slug`，收益与统计仍归本站
+  - `/embed/float` 提供嵌入预览页；`affiliate_clicks` 增加 `source` 列区分来源站点
 
 ### 修复
 

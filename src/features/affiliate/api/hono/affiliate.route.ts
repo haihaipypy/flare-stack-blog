@@ -7,6 +7,14 @@ const app = new Hono<{ Bindings: Env }>();
 
 const POST_PATH_PATTERN = /^\/post\/([^/]+)\/?$/;
 
+/** ?src= 只接受 hostname 形态的字符，其余一律丢弃，避免脏数据进库 */
+function normalizeSource(raw: string | undefined): string | null {
+  if (!raw) return null;
+  const cleaned = raw.toLowerCase().trim();
+  if (!/^[a-z0-9.-]{1,120}$/.test(cleaned)) return null;
+  return cleaned;
+}
+
 /** 从 Referer 里抽出「读者是在哪篇文章点的」，抽不出就记 null */
 function extractPostSlug(referer: string): string | null {
   if (!referer) return null;
@@ -28,7 +36,12 @@ function extractPostSlug(referer: string): string | null {
  */
 async function recordClick(
   env: Env,
-  row: { slug: string; postSlug: string | null; country: string | null },
+  row: {
+    slug: string;
+    postSlug: string | null;
+    source: string | null;
+    country: string | null;
+  },
 ): Promise<void> {
   try {
     await getDb(env).insert(AffiliateClicksTable).values(row).run();
@@ -62,6 +75,7 @@ app.get("/:slug", (c) => {
   const record = recordClick(c.env, {
     slug: offer.slug,
     postSlug: extractPostSlug(c.req.header("referer") ?? ""),
+    source: normalizeSource(c.req.query("src")),
     country: cf?.country ?? null,
   });
 

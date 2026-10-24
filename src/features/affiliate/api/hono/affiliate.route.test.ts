@@ -41,4 +41,17 @@ describe("GET /go/:slug", () => {
     expect(res.status).toBe(302);
     expect(res.headers.get("Location")).toContain("aliyun.com");
   });
+
+  it("站外嵌入带 ?src= 时照常跳转，来源只影响记录", async () => {
+    const res = await get("/tencent-99?src=other-site.cn");
+    expect(res.status).toBe(302);
+    expect(res.headers.get("Location")).toContain("cloud.tencent.com");
+  });
+
+  it("?src= 乱填不会导致出错", async () => {
+    for (const src of ["", "a b", "%00", "x".repeat(300), "../etc/passwd"]) {
+      const res = await get(`/tencent-99?src=${encodeURIComponent(src)}`);
+      expect(res.status).toBe(302);
+    }
+  });
 });

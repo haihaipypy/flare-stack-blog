@@ -16,6 +16,8 @@ export const AffiliateClicksTable = sqliteTable(
     slug: text("slug").notNull(),
     /** 来源文章 slug，从 Referer 解析，解析不出则为 null */
     postSlug: text("post_slug"),
+    /** 来源站点（站外嵌入时由 ?src= 传入的 hostname），本站点击为 null */
+    source: text("source"),
     /** 两位国家码 */
     country: text("country"),
     createdAt,

@@ -3,6 +3,7 @@ import type { Context } from "hono";
 import { Hono } from "hono";
 import { proxy } from "hono/proxy";
 import affiliateRoute from "@/features/affiliate/api/hono/affiliate.route";
+import embedRoute from "@/features/affiliate/api/hono/embed.route";
 import avatarRoute from "@/features/avatar/api/hono/avatar.route";
 import categoriesRoute from "@/features/categories/api/hono/categories.list.route";
 import { exportDownloadRoute } from "@/features/import-export/api/hono/download.route";
@@ -111,6 +112,9 @@ app.route("/avatar", avatarRoute);
 // 推广短链：/go/:slug → 302 厂商活动页（同时记录点击）。
 // 同样放在 shieldMiddleware 之前，否则会被 path-manifest 拦掉。
 app.route("/go", affiliateRoute);
+
+// 站外嵌入的悬浮广告脚本（/embed/float.js），同样先于 shieldMiddleware。
+app.route("/embed", embedRoute);
 
 app.get("/api/auth/*", baseMiddleware, forwardAuthRequest);
 
