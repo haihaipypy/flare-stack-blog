@@ -72,7 +72,6 @@ function AffiliateEnvironment({ offers }: { offers: AffiliateOffer[] }) {
       <div className="affiliate-block__head">
         <Server aria-hidden size={16} strokeWidth={1.75} />
         <span>{m.affiliate_env_title()}</span>
-        <AdTag />
       </div>
 
       <div className="affiliate-grid">
@@ -84,15 +83,22 @@ function AffiliateEnvironment({ offers }: { offers: AffiliateOffer[] }) {
             rel="sponsored nofollow noopener"
             target="_blank"
           >
-            <span className="affiliate-card__provider">{offer.provider}</span>
-            <span className="affiliate-card__title">{offer.title}</span>
-            <span className="affiliate-card__perk">{offer.perk}</span>
-            <span className="affiliate-card__cta">{m.affiliate_cta()} →</span>
+            <span className="affiliate-card__row">
+              <span className="affiliate-card__provider">{offer.provider}</span>
+              <span className="affiliate-card__title">{offer.title}</span>
+            </span>
+            <span className="affiliate-card__row affiliate-card__row--meta">
+              <span className="affiliate-card__perk">{offer.perk}</span>
+              <span className="affiliate-card__cta">{m.affiliate_cta()} →</span>
+            </span>
           </a>
         ))}
       </div>
 
-      <p className="affiliate-block__note">{m.affiliate_disclosure()}</p>
+      <p className="affiliate-block__note">
+        <AdTag />
+        <span>{m.affiliate_disclosure()}</span>
+      </p>
     </div>
   );
 }
