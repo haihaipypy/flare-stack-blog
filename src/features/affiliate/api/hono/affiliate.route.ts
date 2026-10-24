@@ -1,5 +1,6 @@
+import type { Context } from "hono";
 import { Hono } from "hono";
-import { getAffiliateOffer } from "@/features/affiliate/affiliate.config";
+import { getAffiliateConfig } from "@/features/affiliate/service/affiliate.service";
 import { getDb } from "@/lib/db";
 import { AffiliateClicksTable } from "@/lib/db/schema";
 
@@ -26,6 +27,21 @@ function extractPostSlug(referer: string): string | null {
   } catch {
     return null;
   }
+}
+
+/** Hono 的 executionCtx 在少数运行时里访问会抛错，包一层再交给 service */
+function buildDbContext(c: Context<{ Bindings: Env }>) {
+  let executionCtx: ExecutionContext;
+  try {
+    executionCtx = c.executionCtx;
+  } catch {
+    executionCtx = {
+      waitUntil: () => {},
+      passThroughOnException: () => {},
+    } as unknown as ExecutionContext;
+  }
+
+  return { env: c.env, db: getDb(c.env), executionCtx };
 }
 
 /**
@@ -62,10 +78,24 @@ async function recordClick(
  * 用 302 而不是 301：推广链接会换，永久重定向会被浏览器和中间层长期缓存，
  * 换链接后老读者还会被送到旧地址。302 + no-store 每次都经过 Worker，
  * 顺便完成点击统计。
+ *
+ * 目标链接来自数据库（后台「广告管理」），所以换链接不用重新部署。
  */
-app.get("/:slug", (c) => {
+app.get("/:slug", async (c) => {
   const slug = c.req.param("slug");
-  const offer = getAffiliateOffer(slug);
+
+  let offer: { slug: string; url: string } | undefined;
+  try {
+    const config = await getAffiliateConfig(buildDbContext(c));
+    offer = config.offers.find((item) => item.slug === slug && item.enabled);
+  } catch (error) {
+    console.warn(
+      JSON.stringify({
+        message: "affiliate config read failed",
+        error: error instanceof Error ? error.message : String(error),
+      }),
+    );
+  }
 
   if (!offer) {
     return c.redirect("/", 302);

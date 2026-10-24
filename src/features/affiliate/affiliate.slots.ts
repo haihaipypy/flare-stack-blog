@@ -1,54 +1,11 @@
-import type { AffiliateSlug } from "./affiliate.config";
+import { AFFILIATE_SLOT_META, type AffiliateSlotId } from "./affiliate.schema";
 
 /**
- * 广告位定义。
+ * 广告位的确定性挑选。
  *
- * 文章不再写占位符 —— 位置写死在模板里，读者打开任何一篇文章都会看到，
- * 包括这次改动之前发布的历史文章（模板层插入，不依赖正文内容）。
+ * 候选列表来自数据库（后台可增删），这里只负责「从候选里挑几条」，
+ * 不依赖任何编译期常量。
  */
-export type AffiliateSlotId =
-  | "post-top" // 文章正文上方：「本文环境」
-  | "post-bottom" // 文章结尾：横向横幅
-  | "tools-banner"; // 工具页顶部横幅
-
-export type AffiliateVariant = "env" | "banner";
-
-interface SlotConfig {
-  /** 该位置可出现的推广位 */
-  pool: readonly AffiliateSlug[];
-  /** 一次展示几条 */
-  count: number;
-  variant: AffiliateVariant;
-  /** 是否在同一页面内排除另一个位置的选中结果（避免一篇文章出现两条相同广告） */
-  excludeSlot?: AffiliateSlotId;
-}
-
-const ALL: readonly AffiliateSlug[] = [
-  "aliyun-general",
-  "aliyun-99",
-  "aliyun-oss",
-  "tencent-99",
-  "tencent-products",
-];
-
-export const affiliateSlots = {
-  "post-top": {
-    pool: ALL,
-    count: 2,
-    variant: "env",
-  },
-  "post-bottom": {
-    pool: ALL,
-    count: 1,
-    variant: "banner",
-    excludeSlot: "post-top",
-  },
-  "tools-banner": {
-    pool: ALL,
-    count: 1,
-    variant: "banner",
-  },
-} as const satisfies Record<AffiliateSlotId, SlotConfig>;
 
 function fnv1a(input: string): number {
   let hash = 0x811c9dc5;
@@ -78,25 +35,32 @@ function mulberry32(seed: number): () => number {
  * 2. 页面是缓存的，随机会导致同一篇文章对外展示的广告来回变；
  * 3. 调试时说不清「这文章到底挂的哪条」。
  * 不同文章 / 不同位置会自动散开，整体分布仍然均匀。
+ *
+ * @param candidates 可用的 slug（已过滤掉停用的、链接无效的）
+ * @param exclude 本页已经用掉的 slug（避免一篇文章出现两条相同广告）
  */
 export function pickOffers(
   slot: AffiliateSlotId,
   seed: string,
-  exclude: readonly AffiliateSlug[] = [],
-): AffiliateSlug[] {
-  const config = affiliateSlots[slot];
-  const pool = config.pool.filter((slug) => !exclude.includes(slug));
+  candidates: readonly string[],
+  exclude: readonly string[] = [],
+): string[] {
+  const { count } = AFFILIATE_SLOT_META[slot];
 
-  // 池子被排空（理论上不会）时退回原始池，宁可重复也不要空着
-  const candidates = pool.length > 0 ? [...pool] : [...config.pool];
+  const pool = candidates.filter((slug) => !exclude.includes(slug));
+  // 池子被排空（比如只有 2 条广告、文章上方已经用掉）时退回原始池，
+  // 宁可重复也不要空着
+  const usable = pool.length > 0 ? [...pool] : [...candidates];
+
+  if (usable.length === 0) return [];
 
   const random = mulberry32(fnv1a(`${slot}:${seed}`));
 
   // Fisher-Yates
-  for (let i = candidates.length - 1; i > 0; i -= 1) {
+  for (let i = usable.length - 1; i > 0; i -= 1) {
     const j = Math.floor(random() * (i + 1));
-    [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+    [usable[i], usable[j]] = [usable[j], usable[i]];
   }
 
-  return candidates.slice(0, Math.min(config.count, candidates.length));
+  return usable.slice(0, Math.min(count, usable.length));
 }

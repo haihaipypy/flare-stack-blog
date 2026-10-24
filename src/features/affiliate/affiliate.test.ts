@@ -1,99 +1,203 @@
 import { describe, expect, it } from "vitest";
 import {
-  affiliateOffers,
-  affiliateSlugs,
-  getAffiliateOffer,
-  isAffiliateSlug,
-} from "./affiliate.config";
-import { affiliateSlots, pickOffers } from "./affiliate.slots";
+  activeOffers,
+  createDefaultAffiliateConfig,
+  DEFAULT_AFFILIATE_OFFERS,
+  resolveAffiliateConfig,
+} from "./affiliate.defaults";
+import {
+  AFFILIATE_SLOT_IDS,
+  AffiliateConfigInputSchema,
+  AffiliateOfferSchema,
+} from "./affiliate.schema";
+import { pickOffers } from "./affiliate.slots";
 import { affiliateHref } from "./affiliate.url";
 
-describe("推广位配置", () => {
-  it("slug 与对象 key 一致，避免 /go/:slug 找不到目标", () => {
-    for (const slug of affiliateSlugs) {
-      expect(affiliateOffers[slug].slug).toBe(slug);
-    }
+describe("广告配置归一化", () => {
+  it("空值（首次部署 / 从未保存过）返回默认配置", () => {
+    const config = resolveAffiliateConfig(undefined);
+    expect(config.slots["post-top"]).toBe(true);
+    expect(config.offers.length).toBe(DEFAULT_AFFILIATE_OFFERS.length);
   });
 
-  it("所有链接都是 https，且带上推广参数", () => {
-    for (const slug of affiliateSlugs) {
-      const { url } = affiliateOffers[slug];
-      expect(url.startsWith("https://")).toBe(true);
-      expect(url).toMatch(/userCode=|cps_key=/);
-    }
+  it("缺字段时补齐默认值，不丢已配置的项", () => {
+    const config = resolveAffiliateConfig({
+      slots: { "post-top": false },
+      offers: [
+        {
+          slug: "only-one",
+          provider: "测试",
+          title: "标题",
+          perk: "",
+          url: "https://example.com/a",
+          enabled: true,
+        },
+      ],
+    });
+
+    expect(config.slots["post-top"]).toBe(false);
+    expect(config.slots["post-bottom"]).toBe(true); // 补默认
+    expect(config.offers).toHaveLength(1);
+    expect(config.offers[0]?.slug).toBe("only-one");
   });
 
-  it("广告位引用的 slug 都真实存在", () => {
-    for (const config of Object.values(affiliateSlots)) {
-      for (const slug of config.pool) {
-        expect(isAffiliateSlug(slug)).toBe(true);
-      }
-    }
+  it("脏数据整份退回默认，不让后台配置坏掉整站", () => {
+    const config = resolveAffiliateConfig({ offers: "not-an-array" });
+    expect(config.offers).toHaveLength(DEFAULT_AFFILIATE_OFFERS.length);
   });
 
-  it("未知 slug 返回 null 而不是抛错", () => {
-    expect(getAffiliateOffer("nope")).toBeNull();
-    expect(getAffiliateOffer("")).toBeNull();
-    expect(getAffiliateOffer("__proto__")).toBeNull();
+  it("四个位置 id 都有对应开关", () => {
+    const config = createDefaultAffiliateConfig();
+    for (const id of AFFILIATE_SLOT_IDS) {
+      expect(typeof config.slots[id]).toBe("boolean");
+    }
+    expect(Object.keys(config.slots)).toHaveLength(AFFILIATE_SLOT_IDS.length);
+  });
+
+  it("停用的和链接非法的都不会出现在前台", () => {
+    const config = resolveAffiliateConfig({
+      offers: [
+        {
+          slug: "off",
+          provider: "A",
+          title: "T",
+          perk: "",
+          url: "https://example.com",
+          enabled: false,
+        },
+        {
+          slug: "bad-url",
+          provider: "B",
+          title: "T",
+          perk: "",
+          url: "javascript:alert(1)",
+          enabled: true,
+        },
+        {
+          slug: "ok",
+          provider: "C",
+          title: "T",
+          perk: "",
+          url: "https://example.com",
+          enabled: true,
+        },
+      ],
+    });
+
+    expect(activeOffers(config).map((offer) => offer.slug)).toEqual(["ok"]);
   });
 });
 
-describe("affiliateHref", () => {
-  it("走站内短链，不带外域", () => {
-    expect(affiliateHref("aliyun-oss")).toBe("/go/aliyun-oss");
+describe("写入校验", () => {
+  it("slug 只允许小写字母、数字与短横线", () => {
+    const base = {
+      provider: "A",
+      title: "T",
+      perk: "",
+      url: "https://example.com",
+      enabled: true,
+    };
+    expect(
+      AffiliateOfferSchema.safeParse({ ...base, slug: "ok-slug-1" }).success,
+    ).toBe(true);
+    expect(
+      AffiliateOfferSchema.safeParse({ ...base, slug: "Bad Slug" }).success,
+    ).toBe(false);
+    expect(
+      AffiliateOfferSchema.safeParse({ ...base, slug: "-leading" }).success,
+    ).toBe(false);
+    expect(
+      AffiliateOfferSchema.safeParse({ ...base, slug: "中文" }).success,
+    ).toBe(false);
+  });
+
+  it("链接必须是 http(s)", () => {
+    const base = {
+      slug: "x",
+      provider: "A",
+      title: "T",
+      perk: "",
+      enabled: true,
+    };
+    expect(
+      AffiliateOfferSchema.safeParse({
+        ...base,
+        url: "https://a.com/x?y=1&z=2",
+      }).success,
+    ).toBe(true);
+    expect(
+      AffiliateOfferSchema.safeParse({ ...base, url: "javascript:alert(1)" })
+        .success,
+    ).toBe(false);
+  });
+
+  it("整份输入允许只传 slots 或只传 offers", () => {
+    expect(
+      AffiliateConfigInputSchema.safeParse({ slots: { "post-top": false } })
+        .success,
+    ).toBe(true);
+    expect(AffiliateConfigInputSchema.safeParse({ offers: [] }).success).toBe(
+      true,
+    );
   });
 });
 
-describe("pickOffers", () => {
-  it("同一 seed 同一位置结果稳定（SSR 与 hydration 必须一致）", () => {
-    const a = pickOffers("post-top", "docker-note");
-    const b = pickOffers("post-top", "docker-note");
-    expect(a).toEqual(b);
+describe("广告位挑选", () => {
+  const candidates = DEFAULT_AFFILIATE_OFFERS.map((offer) => offer.slug);
+
+  it("文章上方出两条，文末与工具页各一条", () => {
+    expect(pickOffers("post-top", "a", candidates)).toHaveLength(2);
+    expect(pickOffers("post-bottom", "a", candidates)).toHaveLength(1);
+    expect(pickOffers("tools-banner", "a", candidates)).toHaveLength(1);
   });
 
-  it("按位置配置的数量返回，且不重复", () => {
-    const top = pickOffers("post-top", "docker-note");
-    expect(top).toHaveLength(2);
-    expect(new Set(top).size).toBe(2);
-
-    expect(pickOffers("post-bottom", "docker-note")).toHaveLength(1);
-    expect(pickOffers("tools-banner", "tools")).toHaveLength(1);
+  it("同一个 seed 结果固定（SSR 与 hydration 一致）", () => {
+    expect(pickOffers("post-top", "docker-note", candidates)).toEqual(
+      pickOffers("post-top", "docker-note", candidates),
+    );
   });
 
-  it("结果全部落在该位置的池子里", () => {
-    for (const [slot, config] of Object.entries(affiliateSlots)) {
-      for (const seed of ["a", "b", "docker-note", "中文标题"]) {
-        for (const slug of pickOffers(
-          slot as keyof typeof affiliateSlots,
-          seed,
-        )) {
-          expect(config.pool).toContain(slug);
-        }
-      }
-    }
-  });
-
-  it("不同文章会散开，不是所有文章都挂同一条", () => {
-    const picked = new Set(
-      Array.from({ length: 30 }, (_, i) =>
-        pickOffers("post-bottom", `post-${i}`).join(","),
+  it("不同文章散开，不会所有文章都推同一条", () => {
+    const seen = new Set(
+      ["post-a", "post-b", "post-c", "post-d", "post-e", "post-f"].map(
+        (seed) => pickOffers("post-bottom", seed, candidates)[0],
       ),
     );
-    expect(picked.size).toBeGreaterThan(1);
+    expect(seen.size).toBeGreaterThan(1);
   });
 
-  it("文末位会排除正文顶部已选中的广告", () => {
-    for (const seed of ["a", "b", "c", "docker-note", "nas-guide"]) {
-      const top = pickOffers("post-top", seed);
-      const bottom = pickOffers("post-bottom", seed, top);
-      for (const slug of bottom) {
-        expect(top).not.toContain(slug);
+  it("只在候选池内挑，不会返回池外的 slug", () => {
+    for (let i = 0; i < 30; i += 1) {
+      const picked = pickOffers("post-top", `seed-${i}`, candidates);
+      for (const slug of picked) {
+        expect(candidates).toContain(slug);
       }
     }
   });
 
-  it("排除过多时仍能返回结果，不会空着", () => {
-    const all = [...affiliateSlugs];
-    expect(pickOffers("post-bottom", "x", all).length).toBeGreaterThan(0);
+  it("exclude 生效：文末不会重复正文上方已出现的那条", () => {
+    const top = pickOffers("post-top", "docker-note", candidates);
+    const bottom = pickOffers("post-bottom", "docker-note", candidates, top);
+    expect(top).not.toContain(bottom[0]);
+  });
+
+  it("候选排空时退回原始池，宁可重复也不空着", () => {
+    const only = ["single-offer"];
+    const bottom = pickOffers("post-bottom", "x", only, only);
+    expect(bottom).toEqual(["single-offer"]);
+  });
+
+  it("没有任何候选时返回空数组", () => {
+    expect(pickOffers("post-top", "x", [])).toEqual([]);
+  });
+});
+
+describe("短链", () => {
+  it("统一走站内 /go/ 中转", () => {
+    expect(affiliateHref("aliyun-general")).toBe("/go/aliyun-general");
+  });
+
+  it("slug 会被 URL 编码，不会拼出非法路径", () => {
+    expect(affiliateHref("a b")).toBe("/go/a%20b");
   });
 });

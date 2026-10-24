@@ -3,6 +3,7 @@ import { createFileRoute, notFound } from "@tanstack/react-router";
 import theme from "@theme";
 import { useEffect } from "react";
 import { z } from "zod";
+import { affiliatePublicConfigQuery } from "@/features/affiliate/queries";
 import { siteConfigQuery, siteDomainQuery } from "@/features/config/queries";
 import { getOptimizedImageUrl } from "@/features/media/utils/media.utils";
 import { recordPageViewFn } from "@/features/pageview/api/pageview.api";
@@ -30,6 +31,8 @@ export const Route = createFileRoute("/_public/post/$slug")({
       context.queryClient.ensureQueryData(postBySlugQuery(params.slug)),
       context.queryClient.ensureQueryData(siteDomainQuery),
       context.queryClient.ensureQueryData(siteConfigQuery),
+      // 广告位配置（后台「广告管理」）也要预取，否则 SSR 时 AffiliateSlot 拿不到
+      context.queryClient.ensureQueryData(affiliatePublicConfigQuery),
     ]);
 
     // 2. Deferred: Related posts (prefetch only, don't await)

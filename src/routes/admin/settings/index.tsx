@@ -7,6 +7,7 @@ import {
   LayoutTemplate,
   Loader2,
   Mail,
+  Megaphone,
   Webhook,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
@@ -14,6 +15,8 @@ import { FormProvider, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AffiliateManager } from "@/features/affiliate/components/admin/affiliate-manager";
+import { getAdminText } from "@/features/affiliate/components/admin/text";
 import { MaintenanceSection } from "@/features/config/components/maintenance-section";
 import { SectionSkeleton } from "@/features/config/components/settings-skeleton";
 import { SiteSettingsSection } from "@/features/config/components/site-settings-section";
@@ -51,11 +54,17 @@ function RouteComponent() {
   const [activeTab, setActiveTab] = useState("site");
   const formRef = useRef<HTMLFormElement>(null);
   const hasMountedRef = useRef(false);
+  const adminText = getAdminText();
   const tabItems = [
     {
       value: "site",
       icon: LayoutTemplate,
       label: m.settings_tab_site(),
+    },
+    {
+      value: "affiliate",
+      icon: Megaphone,
+      label: adminText.tabAffiliate,
     },
     {
       value: "email",
@@ -225,6 +234,11 @@ function RouteComponent() {
                 </p>
               </div>
               <SiteSettingsSection />
+            </TabsContent>
+
+            <TabsContent value="affiliate" className="mt-0 space-y-10">
+              {/* 广告配置独立保存，不参与外层表单的 isDirty / submit */}
+              <AffiliateManager />
             </TabsContent>
 
             <TabsContent value="integrations" className="mt-0 space-y-10">

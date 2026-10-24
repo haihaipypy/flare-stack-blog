@@ -1,5 +1,9 @@
+import type { Context } from "hono";
 import { Hono } from "hono";
+import { activeOffers } from "@/features/affiliate/affiliate.defaults";
 import { buildFloatEmbedScript } from "@/features/affiliate/embed/float-embed";
+import { getAffiliateConfig } from "@/features/affiliate/service/affiliate.service";
+import { getDb } from "@/lib/db";
 
 const app = new Hono<{ Bindings: Env }>();
 
@@ -11,15 +15,46 @@ const SCRIPT_HEADERS = {
   "X-Content-Type-Options": "nosniff",
 } as const;
 
+function buildDbContext(c: Context<{ Bindings: Env }>) {
+  let executionCtx: ExecutionContext;
+  try {
+    executionCtx = c.executionCtx;
+  } catch {
+    executionCtx = {
+      waitUntil: () => {},
+      passThroughOnException: () => {},
+    } as unknown as ExecutionContext;
+  }
+
+  return { env: c.env, db: getDb(c.env), executionCtx };
+}
+
 /**
  * 悬浮广告嵌入脚本。
  *
- * 缓存 5 分钟：改完 affiliate.config.ts 部署后，所有嵌入站点最迟 5 分钟自动换新，
- * 又不会让每个访客都回源。
+ * 内容是运行时从数据库读的（后台「广告管理」）：
+ * - 悬浮位总开关关掉，或一条可用广告都没有 → 下发空脚本，宿主站不会报错；
+ * - 缓存 5 分钟，改完配置最迟 5 分钟全站生效。
  */
-app.get("/float.js", (c) => {
+app.get("/float.js", async (c) => {
   const origin = new URL(c.req.url).origin;
-  return c.body(buildFloatEmbedScript(origin), 200, {
+
+  let offers: Awaited<ReturnType<typeof activeOffers>> = [];
+  try {
+    const config = await getAffiliateConfig(buildDbContext(c));
+    if (config.slots["embed-float"]) {
+      offers = activeOffers(config);
+    }
+  } catch (error) {
+    console.warn(
+      JSON.stringify({
+        message: "affiliate embed config read failed",
+        error: error instanceof Error ? error.message : String(error),
+      }),
+    );
+  }
+
+  return c.body(buildFloatEmbedScript(origin, offers), 200, {
     ...SCRIPT_HEADERS,
     "Cache-Control": "public, max-age=300",
   });
@@ -49,6 +84,10 @@ app.get("/float", (c) => {
   pre { padding:14px 16px; border-radius:10px; background:#0d1117; color:#c9d1d9;
         font-size:12.5px; line-height:1.6; overflow:auto; }
   .tip { font-size:13px; color:#8b949e; }
+  @media (prefers-color-scheme:dark) {
+    body { background:#16171a; color:#f0f1f3; }
+    p { color:#a0a6ad; }
+  }
 </style>
 </head>
 <body>
@@ -57,8 +96,12 @@ app.get("/float", (c) => {
     <p>桌面端（宽度 ≥ 1024px）右下角会出现悬浮卡；手机上不显示。点一下卡片，应当先跳到
        <code>${origin}/go/&lt;slug&gt;</code>，再由 302 转到对应厂商。</p>
     <pre>&lt;script src="${origin}/embed/float.js" data-aff-float async&gt;&lt;/script&gt;</pre>
+    <p class="tip">位置不限：<code>&lt;head&gt;</code> 里、<code>&lt;/body&gt;</code> 前、<code>&lt;footer&gt;</code> 内部，
+       或网站后台的「页脚代码」输入框都可以 —— 脚本会自己等 DOM 就绪再把卡片挂到页面最外层。
+       同一页贴多份也只出一个卡片。</p>
     <p class="tip">可以加这些属性：<code>data-position="left"</code>、<code>data-delay="0"</code>、
        <code>data-dismiss-days="7"</code>、<code>data-offer="tencent-99"</code>、<code>data-lang="en"</code>。</p>
+    <p class="tip">在后台「广告管理 → 悬浮广告」里关掉这个位置后，本页刷新就不会再出现卡片。</p>
   </div>
   <script src="${origin}/embed/float.js" data-aff-float async></script>
 </body>

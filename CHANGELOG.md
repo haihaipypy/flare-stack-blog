@@ -26,7 +26,10 @@
 - **广告位（affiliate）**
   - 位置写在模板里，**历史文章自动生效**，发文不需要任何额外操作：文章正文上方「本文环境」、文末横幅、工具页顶部横幅
   - 每个位置由文章 slug 做**确定性随机**挑选推广位（刷新不变、SSR 与 hydration 一致），文末位自动避开正文上方已选中的那条
-  - 推广链接集中在 `src/features/affiliate/affiliate.config.ts`，换链接不必回头改历史文章
+  - 推广位内容（平台、标题、优惠文案、链接）在后台 **设置 → 广告** 里维护，改完保存即时生效，**不用改代码也不用重新部署**
+  - 四个位置各自独立开关（文章上方、文末、工具页、站外悬浮），关掉后连历史文章一起停
+  - 后台内置点击统计：站外来源域名、各推广位、各文章、每日趋势，可切换 7 / 30 / 90 天
+  - 「悬浮广告」页直接给出预览入口与嵌入代码，一键复制
   - 所有外链统一走 `/go/:slug` 302 中转，带 `rel="sponsored nofollow"`、披露文案与「广告」标识
   - 新增 `affiliate_clicks` 表，记录每次点击的广告位、来源文章与两位国家码（不存 IP / UA）
   - **站外嵌入**：`/embed/float.js` 一套自包含悬浮脚本，其他网站插一行 `<script data-aff-float>` 即可显示广告；脚本只含 slug，点击一律回流 `/go/:slug`，收益与统计仍归本站
@@ -34,6 +37,7 @@
 
 ### 修复
 
+- **站外悬浮脚本不再挑插入位置**：原先要求放在 `</body>` 之前。现在 `<head>`、`<footer>`、后台「页脚代码」输入框、JS 动态注入均可 —— body 已存在就直接挂载，不存在才等 `DOMContentLoaded`；挂载点兜底到 `document.documentElement`。同时加了全页单例标记（贴多份也只出一个卡片）、内层样式改双段选择器（压得住宿主 `.footer a` 之类规则）、可继承属性全部显式覆盖，并在宿主站为深色时跟随 `prefers-color-scheme`
 - **修复 26 处类型错误**：`src/routeTree.gen.ts` 由旧版生成器产出，缺失 `@tanstack/react-start` 的 `Register` 模块增强（`router` 注册项），导致全局路由类型退化为 `AnyRouter` —— `useRouteContext({ from: "__root__" })` 返回 `any`、`navigate({ search: (prev) => … })` 的 `prev` 隐式 `any`。重新生成该文件后类型检查归零，pre-push 钩子恢复正常
 
 ## 2026-09

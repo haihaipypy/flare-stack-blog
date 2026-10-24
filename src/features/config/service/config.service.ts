@@ -211,7 +211,13 @@ export async function updateSystemConfig(
   data: SystemConfig,
 ) {
   const currentConfig = await ConfigRepo.getSystemConfig(context.db);
-  const nextConfig = resolveSystemConfig(data);
+
+  // 设置页的表单不含 affiliate（广告在 /admin/affiliate 单独维护），
+  // zod 会把它 strip 掉。这里补回旧值，否则保存一次站点设置就把广告配置清空了。
+  const nextConfig = resolveSystemConfig({
+    ...data,
+    affiliate: data.affiliate ?? currentConfig?.affiliate,
+  });
 
   await ConfigRepo.upsertSystemConfig(context.db, nextConfig);
   await CacheService.deleteKey(context, CONFIG_CACHE_KEYS.system);

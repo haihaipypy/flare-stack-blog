@@ -1,13 +1,17 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import theme from "@theme";
+import { affiliatePublicConfigQuery } from "@/features/affiliate/queries";
 import { siteConfigQuery } from "@/features/config/queries";
 
 export const Route = createFileRoute("/_public/tools")({
   component: RouteComponent,
   loader: async ({ context }) => {
-    const siteConfig =
-      await context.queryClient.ensureQueryData(siteConfigQuery);
+    // 广告位配置与站点配置一起预取，SSR 时 AffiliateSlot 才能直接拿到
+    const [siteConfig] = await Promise.all([
+      context.queryClient.ensureQueryData(siteConfigQuery),
+      context.queryClient.ensureQueryData(affiliatePublicConfigQuery),
+    ]);
     return {
       title: siteConfig.tools_page_title,
       description: siteConfig.tools_page_description,
