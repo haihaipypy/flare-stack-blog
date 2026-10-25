@@ -12,6 +12,11 @@ const SCRIPT_HEADERS = {
   // 站外引用要允许跨域；链接本身是导航，不受 CORS 影响，但脚本标签的
   // crossorigin / 某些站长平台的探测请求需要这个头
   "Access-Control-Allow-Origin": "*",
+  // 宿主站可能开了 Cross-Origin-Embedder-Policy: require-corp（为了 WASM 多线程、
+  // SharedArrayBuffer），此时跨域 <script> 必须自带 CORP，否则控制台会报
+  // net::ERR_BLOCKED_BY_RESPONSE，看起来像「脚本坏了」。
+  // 本脚本只做 DOM 操作，没有 iframe / 外链图片 / fetch，所以一个头就够。
+  "Cross-Origin-Resource-Policy": "cross-origin",
   "X-Content-Type-Options": "nosniff",
 } as const;
 
@@ -107,7 +112,11 @@ app.get("/float", (c) => {
 </body>
 </html>`,
     200,
-    { "Cache-Control": "no-store" },
+    {
+      "Cache-Control": "no-store",
+      // 允许被开了 COEP: require-corp 的站点用 iframe 预览
+      "Cross-Origin-Resource-Policy": "cross-origin",
+    },
   );
 });
 

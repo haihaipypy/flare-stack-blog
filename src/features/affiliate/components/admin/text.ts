@@ -89,7 +89,7 @@ const zh = {
     "位置不限：</body> 前、<head> 里（保留 async）、<footer> 内部，或网站后台的「页脚代码」输入框。脚本会自己等 DOM 就绪再挂载。",
   embedParamsTitle: "可选参数",
   embedNote:
-    "代码内容不需要改。以后换链接、加推广位，嵌了这段代码的网站会在 5 分钟内自动跟着更新。",
+    "代码内容不需要改。以后换链接、加推广位，嵌了这段代码的网站会在 5 分钟内自动跟着更新。宿主站若开了 COEP（require-corp），脚本已自带 CORP 头，不用额外配置。",
 };
 
 const en: typeof zh = {
@@ -177,7 +177,7 @@ const en: typeof zh = {
     "Anywhere: before </body>, inside <head> (keep async), inside <footer>, or a site’s custom footer code box. The script waits for DOM readiness on its own.",
   embedParamsTitle: "Optional attributes",
   embedNote:
-    "The snippet itself never changes. If you edit links or add offers, sites carrying it pick up the update within 5 minutes.",
+    "The snippet itself never changes. If you edit links or add offers, sites carrying it pick up the update within 5 minutes. If the host page enables COEP (require-corp), the script already sends the CORP header — no extra setup needed.",
 };
 
 const TEXTS = { zh, en } as const;

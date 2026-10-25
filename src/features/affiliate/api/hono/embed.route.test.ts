@@ -12,6 +12,11 @@ describe("GET /embed/float.js", () => {
     expect(res.headers.get("X-Content-Type-Options")).toBe("nosniff");
   });
 
+  it("带 CORP 头，宿主站 COEP: require-corp 下也不会被拦", async () => {
+    const res = await get("/float.js");
+    expect(res.headers.get("Cross-Origin-Resource-Policy")).toBe("cross-origin");
+  });
+
   it("缓存 5 分钟，改完链接能较快生效", async () => {
     const res = await get("/float.js");
     expect(res.headers.get("Cache-Control")).toContain("max-age=300");
@@ -30,6 +35,7 @@ describe("GET /embed/float", () => {
     expect(res.status).toBe(200);
     expect(res.headers.get("Content-Type")).toContain("text/html");
     expect(res.headers.get("Cache-Control")).toBe("no-store");
+    expect(res.headers.get("Cross-Origin-Resource-Policy")).toBe("cross-origin");
     const html = await res.text();
     expect(html).toContain("data-aff-float");
     expect(html).toContain("/embed/float.js");
