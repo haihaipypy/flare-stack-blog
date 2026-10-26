@@ -30,6 +30,7 @@ import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
 import { Route as AdminPostsRouteRouteImport } from './routes/admin/posts/route'
 import { Route as AdminToolsIndexRouteImport } from './routes/admin/tools/index'
+import { Route as AdminUsersIndexRouteImport } from './routes/admin/users/index'
 import { Route as AdminTagsIndexRouteImport } from './routes/admin/tags/index'
 import { Route as AdminSettingsIndexRouteImport } from './routes/admin/settings/index'
 import { Route as AdminPostsIndexRouteImport } from './routes/admin/posts/index'
@@ -142,6 +143,11 @@ const AdminToolsIndexRoute = AdminToolsIndexRouteImport.update({
   path: '/tools/',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const AdminUsersIndexRoute = AdminUsersIndexRouteImport.update({
+  id: '/users/',
+  path: '/users/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminTagsIndexRoute = AdminTagsIndexRouteImport.update({
   id: '/tags/',
   path: '/tags/',
@@ -215,6 +221,7 @@ export interface FileRoutesByFullPath {
   '/admin/settings/': typeof AdminSettingsIndexRoute
   '/admin/tags/': typeof AdminTagsIndexRoute
   '/admin/tools/': typeof AdminToolsIndexRoute
+  '/admin/users/': typeof AdminUsersIndexRoute
   '/admin/posts/edit/$id': typeof AdminPostsEditIdRoute
 }
 export interface FileRoutesByTo {
@@ -242,6 +249,7 @@ export interface FileRoutesByTo {
   '/admin/settings': typeof AdminSettingsIndexRoute
   '/admin/tags': typeof AdminTagsIndexRoute
   '/admin/tools': typeof AdminToolsIndexRoute
+  '/admin/users': typeof AdminUsersIndexRoute
   '/admin/posts/edit/$id': typeof AdminPostsEditIdRoute
 }
 export interface FileRoutesById {
@@ -275,6 +283,7 @@ export interface FileRoutesById {
   '/admin/settings/': typeof AdminSettingsIndexRoute
   '/admin/tags/': typeof AdminTagsIndexRoute
   '/admin/tools/': typeof AdminToolsIndexRoute
+  '/admin/users/': typeof AdminUsersIndexRoute
   '/admin/posts/edit/$id': typeof AdminPostsEditIdRoute
 }
 export interface FileRouteTypes {
@@ -306,6 +315,7 @@ export interface FileRouteTypes {
     | '/admin/settings/'
     | '/admin/tags/'
     | '/admin/tools/'
+    | '/admin/users/'
     | '/admin/posts/edit/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -333,6 +343,7 @@ export interface FileRouteTypes {
     | '/admin/settings'
     | '/admin/tags'
     | '/admin/tools'
+    | '/admin/users'
     | '/admin/posts/edit/$id'
   id:
     | '__root__'
@@ -365,6 +376,7 @@ export interface FileRouteTypes {
     | '/admin/settings/'
     | '/admin/tags/'
     | '/admin/tools/'
+    | '/admin/users/'
     | '/admin/posts/edit/$id'
   fileRoutesById: FileRoutesById
 }
@@ -525,6 +537,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminToolsIndexRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/admin/users/': {
+      id: '/admin/users/'
+      path: '/users'
+      fullPath: '/admin/users/'
+      preLoaderRoute: typeof AdminUsersIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/admin/tags/': {
       id: '/admin/tags/'
       path: '/tags'
@@ -673,6 +692,7 @@ interface AdminRouteRouteChildren {
   AdminSettingsIndexRoute: typeof AdminSettingsIndexRoute
   AdminTagsIndexRoute: typeof AdminTagsIndexRoute
   AdminToolsIndexRoute: typeof AdminToolsIndexRoute
+  AdminUsersIndexRoute: typeof AdminUsersIndexRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
@@ -685,6 +705,7 @@ const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminSettingsIndexRoute: AdminSettingsIndexRoute,
   AdminTagsIndexRoute: AdminTagsIndexRoute,
   AdminToolsIndexRoute: AdminToolsIndexRoute,
+  AdminUsersIndexRoute: AdminUsersIndexRoute,
 }
 
 const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(

@@ -11,6 +11,7 @@ import {
   MessageSquare,
   Tag,
   User,
+  Users,
   X,
 } from "lucide-react";
 import { useState } from "react";
@@ -115,6 +116,12 @@ export function SideBar({
       path: "/admin/friend-links",
       icon: Link2,
       label: m.admin_sidebar_friend_links(),
+      exact: false,
+    },
+    {
+      path: "/admin/users",
+      icon: Users,
+      label: m.admin_sidebar_users(),
       exact: false,
     },
   ] satisfies Array<NavItem>;
