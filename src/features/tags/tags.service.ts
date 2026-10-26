@@ -1,7 +1,6 @@
 import { z } from "zod";
 import * as CacheService from "@/features/cache/cache.service";
 import * as PostRepo from "@/features/posts/data/posts.data";
-import { POSTS_CACHE_KEYS } from "@/features/posts/schema/posts.schema";
 import * as PostAutoSnapshotService from "@/features/posts/services/post-auto-snapshot.service";
 import * as TagRepo from "@/features/tags/data/tags.data";
 import type {
@@ -57,9 +56,10 @@ export async function getPublicTags(
     executionCtx: ExecutionContext;
   },
 ) {
-  return await CacheService.get(
+  return await CacheService.getVersioned(
     context,
-    TAGS_CACHE_KEYS.publicList,
+    "site",
+    (version) => [version, ...TAGS_CACHE_KEYS.publicList],
     z.array(TagWithCountSchema),
     async () => {
       return await TagRepo.getAllTagsWithCount(context.db, {
@@ -111,26 +111,16 @@ async function invalidateTagRelatedCache(
   context: DbContext,
   affectedPosts: Array<{ id: number; slug: string }>,
 ) {
-  // 1. 无论如何都清除 publicList
-  await CacheService.deleteKey(context, TAGS_CACHE_KEYS.publicList);
+  // 1. 无论如何都让 publicList 失效（版本号全局生效，不依赖 Cache API 局部删除）
+  await CacheService.bumpVersion(context, "site");
 
   if (affectedPosts.length > 0) {
     // 2. 精确失效受影响的文章
     const tasks: Array<Promise<void>> = [];
 
-    // Bump post list version
+    // Bump post list / detail version（版本号全局生效，替代逐篇删除）
     tasks.push(CacheService.bumpVersion(context, "posts:list"));
-
-    // Invalidate each affected post's detail cache
-    const version = await CacheService.getVersion(context, "posts:detail");
-    for (const post of affectedPosts) {
-      tasks.push(
-        CacheService.deleteKey(
-          context,
-          POSTS_CACHE_KEYS.detail(version, post.slug),
-        ),
-      );
-    }
+    tasks.push(CacheService.bumpVersion(context, "posts:detail"));
 
     // Purge CDN for affected posts and list pages
     const cdnUrls = ["/", "/posts"];

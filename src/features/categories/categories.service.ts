@@ -16,7 +16,6 @@ import {
 } from "@/features/categories/categories.schema";
 import * as CategoryRepo from "@/features/categories/data/categories.data";
 import * as PostRepo from "@/features/posts/data/posts.data";
-import { POSTS_CACHE_KEYS } from "@/features/posts/schema/posts.schema";
 import * as PostAutoSnapshotService from "@/features/posts/services/post-auto-snapshot.service";
 import { err, ok } from "@/lib/errors";
 import { purgeCDNCache } from "@/lib/invalidate";
@@ -56,9 +55,10 @@ export async function getPublicCategories(
     executionCtx: ExecutionContext;
   },
 ) {
-  return await CacheService.get(
+  return await CacheService.getVersioned(
     context,
-    CATEGORIES_CACHE_KEYS.publicList,
+    "site",
+    (version) => [version, ...CATEGORIES_CACHE_KEYS.publicList],
     z.array(CategoryWithCountSchema),
     async () => {
       return await CategoryRepo.getAllCategoriesWithCount(context.db, {
@@ -97,22 +97,13 @@ async function invalidateCategoryRelatedCache(
   context: DbContext,
   affectedPosts: Array<{ id: number; slug: string }>,
 ) {
-  await CacheService.deleteKey(context, CATEGORIES_CACHE_KEYS.publicList);
+  await CacheService.bumpVersion(context, "site");
 
   if (affectedPosts.length > 0) {
     const tasks: Array<Promise<void>> = [];
 
     tasks.push(CacheService.bumpVersion(context, "posts:list"));
-
-    const version = await CacheService.getVersion(context, "posts:detail");
-    for (const post of affectedPosts) {
-      tasks.push(
-        CacheService.deleteKey(
-          context,
-          POSTS_CACHE_KEYS.detail(version, post.slug),
-        ),
-      );
-    }
+    tasks.push(CacheService.bumpVersion(context, "posts:detail"));
 
     const cdnUrls = ["/", "/posts"];
     for (const post of affectedPosts) {
@@ -299,7 +290,7 @@ export async function setPostCategories(
 
   context.executionCtx.waitUntil(
     Promise.all([
-      CacheService.deleteKey(context, CATEGORIES_CACHE_KEYS.publicList),
+      CacheService.bumpVersion(context, "site"),
       CacheService.bumpVersion(context, "posts:list"),
       purgeCDNCache(context.env, { urls: ["/", "/posts"] }),
     ]),

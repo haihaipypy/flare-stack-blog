@@ -175,9 +175,17 @@ function hasSiteConfigChanged(
 export async function getSystemConfig(
   context: DbContext & { executionCtx: ExecutionContext },
 ) {
+  // 配置走版本化 key，保存时 bump 一次即可在所有数据中心同时失效
+  const version = await CacheService.getVersion(context, "site:config").catch(
+    () => null,
+  );
+  const cacheKey = version
+    ? ([version, ...CONFIG_CACHE_KEYS.system] as const)
+    : CONFIG_CACHE_KEYS.system;
+
   const config = await CacheService.get(
     context,
-    CONFIG_CACHE_KEYS.system,
+    cacheKey,
     SystemConfigSchema,
     async () =>
       resolveSystemConfig(await ConfigRepo.getSystemConfig(context.db)),
@@ -187,12 +195,9 @@ export async function getSystemConfig(
 
   if (JSON.stringify(config) !== JSON.stringify(normalizedConfig)) {
     context.executionCtx.waitUntil(
-      CacheService.set(
-        context,
-        CONFIG_CACHE_KEYS.system,
-        JSON.stringify(normalizedConfig),
-        { ttl: "1h" },
-      ),
+      CacheService.set(context, cacheKey, JSON.stringify(normalizedConfig), {
+        ttl: "1h",
+      }),
     );
   }
 
@@ -220,7 +225,7 @@ export async function updateSystemConfig(
   });
 
   await ConfigRepo.upsertSystemConfig(context.db, nextConfig);
-  await CacheService.deleteKey(context, CONFIG_CACHE_KEYS.system);
+  await CacheService.bumpVersion(context, "site:config");
 
   if (hasSiteConfigChanged(currentConfig, nextConfig)) {
     await purgeSiteCDNCache(context.env);

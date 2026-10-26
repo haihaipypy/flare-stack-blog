@@ -394,13 +394,7 @@ export async function deletePost(
   // Only clear cache/index for published posts
   if (post.status === "published") {
     const tasks = [];
-    const version = await CacheService.getVersion(context, "posts:detail");
-    tasks.push(
-      CacheService.deleteKey(
-        context,
-        POSTS_CACHE_KEYS.detail(version, post.slug),
-      ),
-    );
+    tasks.push(CacheService.bumpVersion(context, "posts:detail"));
     tasks.push(CacheService.bumpVersion(context, "posts:list"));
     tasks.push(SearchService.deleteIndex(context, { id: data.id }));
     tasks.push(purgePostCDNCache(context.env, post.slug));

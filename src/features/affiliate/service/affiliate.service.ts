@@ -1,6 +1,5 @@
 import { and, desc, gte, isNotNull, sql } from "drizzle-orm";
 import * as CacheService from "@/features/cache/cache.service";
-import { CONFIG_CACHE_KEYS } from "@/features/config/config.schema";
 import * as ConfigRepo from "@/features/config/data/config.data";
 import {
   getSystemConfig,
@@ -52,7 +51,7 @@ export async function updateAffiliateConfig(
     context.db,
     resolveSystemConfig({ ...current, affiliate: next }),
   );
-  await CacheService.deleteKey(context, CONFIG_CACHE_KEYS.system);
+  await CacheService.bumpVersion(context, "site:config");
 
   // 页面 HTML 里已经烧进了广告卡片，不清 CDN 就会继续显示旧配置
   await purgeSiteCDNCache(context.env);

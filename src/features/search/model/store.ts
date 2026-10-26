@@ -54,6 +54,16 @@ let cachedDb: MyOramaDB | null = null;
 let cachedVersion: string | null = null;
 let inflight: Promise<MyOramaDB> | null = null;
 
+/**
+ * 索引版本号的内存缓存。
+ * 之前每次搜索都会 KV.get(meta) —— 搜索框每敲一次就是一次配额消耗。
+ * 现在同一实例 30 秒内只读一次 KV；索引更新最多延迟 30 秒可见。
+ */
+const META_MEMORY_TTL_MS = 30_000;
+let metaCache: { value: OramaMeta | null; expiresAt: number } | null = null;
+
+type OramaMeta = { version: string };
+
 async function loadFromKv(env: Env): Promise<MyOramaDB | null> {
   const buf = await env.KV.get(KV_KEY, "arrayBuffer");
   if (!buf) return null;
@@ -107,6 +117,12 @@ export async function persistOramaDb(env: Env, db: MyOramaDB) {
     sizeInBytes: compressed.byteLength,
   };
   await env.KV.put(KV_META_KEY, JSON.stringify(meta));
+  if (env.ENVIRONMENT !== "test") {
+    metaCache = {
+      value: { version: newVersion },
+      expiresAt: Date.now() + META_MEMORY_TTL_MS,
+    };
+  }
   setOramaDb(db, newVersion);
   return newVersion;
 }
@@ -114,7 +130,21 @@ export async function persistOramaDb(env: Env, db: MyOramaDB) {
 export async function getOramaMeta(
   env: Env,
 ): Promise<{ version: string } | null> {
-  return await env.KV.get(KV_META_KEY, "json");
+  if (env.ENVIRONMENT !== "test" && metaCache) {
+    if (metaCache.expiresAt > Date.now()) return metaCache.value;
+    metaCache = null;
+  }
+
+  const meta = await env.KV.get<OramaMeta>(KV_META_KEY, "json");
+
+  if (env.ENVIRONMENT !== "test") {
+    metaCache = {
+      value: meta,
+      expiresAt: Date.now() + META_MEMORY_TTL_MS,
+    };
+  }
+
+  return meta;
 }
 
 export function setOramaDb(db: MyOramaDB, version: string) {

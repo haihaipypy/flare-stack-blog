@@ -1,9 +1,6 @@
 import * as CacheService from "@/features/cache/cache.service";
-import { CATEGORIES_CACHE_KEYS } from "@/features/categories/categories.schema";
-import { POSTS_CACHE_KEYS } from "@/features/posts/schema/posts.schema";
 import * as PostService from "@/features/posts/services/posts.service";
 import * as SearchService from "@/features/search/service/search.service";
-import { TAGS_CACHE_KEYS } from "@/features/tags/tags.schema";
 import { getDb } from "@/lib/db";
 import { purgePostCDNCache } from "@/lib/invalidate";
 
@@ -13,13 +10,12 @@ export async function fetchPost(env: Env, postId: number) {
 }
 
 export async function invalidatePostCaches(env: Env, slug: string) {
-  const version = await CacheService.getVersion({ env }, "posts:detail");
   await Promise.all([
-    CacheService.deleteKey({ env }, POSTS_CACHE_KEYS.detail(version, slug)),
+    // 版本号全局生效；Cache API 的 delete 只在当前数据中心有效，不能用它做跨区失效
+    CacheService.bumpVersion({ env }, "posts:detail"),
     purgePostCDNCache(env, slug),
     CacheService.bumpVersion({ env }, "posts:list"),
-    CacheService.deleteKey({ env }, TAGS_CACHE_KEYS.publicList),
-    CacheService.deleteKey({ env }, CATEGORIES_CACHE_KEYS.publicList),
+    CacheService.bumpVersion({ env }, "site"),
   ]);
 }
 
