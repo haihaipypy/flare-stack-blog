@@ -34,12 +34,14 @@ function ProfilePage() {
   const user = session?.user;
 
   const profileForm = useProfileForm({ user });
-  const passwordForm = usePasswordForm();
+  // hasPassword 决定密码卡片是「设置」还是「修改」：
+  // 用 GitHub 注册的账号在 account 表里没有 credential 记录，只能设置新密码。
   const { data: hasPassword } = useQuery({
     queryKey: AUTH_KEYS.hasPassword(user?.id),
     queryFn: () => userHasPasswordFn(),
     enabled: !!user,
   });
+  const passwordForm = usePasswordForm({ hasPassword: hasPassword === true });
   const notification = useNotificationToggle(user?.id);
   const { logout } = useLogout();
 
@@ -49,7 +51,7 @@ function ProfilePage() {
     <theme.ProfilePage
       user={user}
       profileForm={profileForm}
-      passwordForm={hasPassword ? passwordForm : null}
+      passwordForm={hasPassword === undefined ? null : passwordForm}
       notification={notification}
       logout={logout}
     />

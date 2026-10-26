@@ -17,6 +17,7 @@ const COMMON_AUTH_ERROR_CODES = [
   "INVALID_TOKEN",
   "SESSION_EXPIRED",
   "CREDENTIAL_ACCOUNT_NOT_FOUND",
+  "PASSWORD_ALREADY_SET",
 ] as const satisfies ReadonlyArray<BetterAuthErrorCode>;
 
 type CommonAuthErrorCode = (typeof COMMON_AUTH_ERROR_CODES)[number];
@@ -98,6 +99,8 @@ function getSharedAuthErrorMessage(
       return messages.auth_error_session_expired();
     case "CREDENTIAL_ACCOUNT_NOT_FOUND":
       return messages.auth_error_credential_not_found();
+    case "PASSWORD_ALREADY_SET":
+      return messages.auth_error_password_already_set();
   }
 }
 

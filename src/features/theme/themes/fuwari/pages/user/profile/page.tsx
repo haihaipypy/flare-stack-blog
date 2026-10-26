@@ -198,26 +198,36 @@ export function ProfilePage({
                   <Shield className="w-5 h-5" />
                 </div>
                 <h2 className="text-xl font-bold fuwari-text-90">
-                  {m.profile_password_security()}
+                  {passwordForm.mode === "set"
+                    ? m.profile_password_set_title()
+                    : m.profile_password_security()}
                 </h2>
               </div>
 
+              {passwordForm.mode === "set" && (
+                <p className="-mt-2 text-sm fuwari-text-50 leading-relaxed">
+                  {m.profile_password_set_desc({ email: user.email })}
+                </p>
+              )}
+
               <form onSubmit={passwordForm.handleSubmit} className="space-y-6">
-                <div>
-                  <label className={labelClassName}>
-                    {m.profile_current_password()}
-                  </label>
-                  <input
-                    type="password"
-                    {...passwordForm.register("currentPassword")}
-                    className={inputClassName}
-                  />
-                  {passwordForm.errors.currentPassword && (
-                    <span className="text-sm text-red-500 font-medium ml-1 mt-1 block">
-                      {passwordForm.errors.currentPassword.message}
-                    </span>
-                  )}
-                </div>
+                {passwordForm.mode === "change" && (
+                  <div>
+                    <label className={labelClassName}>
+                      {m.profile_current_password()}
+                    </label>
+                    <input
+                      type="password"
+                      {...passwordForm.register("currentPassword")}
+                      className={inputClassName}
+                    />
+                    {passwordForm.errors.currentPassword && (
+                      <span className="text-sm text-red-500 font-medium ml-1 mt-1 block">
+                        {passwordForm.errors.currentPassword.message}
+                      </span>
+                    )}
+                  </div>
+                )}
 
                 <div>
                   <label className={labelClassName}>
@@ -260,7 +270,9 @@ export function ProfilePage({
                     {passwordForm.isSubmitting && (
                       <Loader2 className="w-4 h-4 animate-spin" />
                     )}
-                    {m.profile_update_password_fuwari()}
+                    {passwordForm.mode === "set"
+                      ? m.profile_set_password()
+                      : m.profile_update_password_fuwari()}
                   </button>
                 </div>
               </form>

@@ -9,6 +9,8 @@ export const AUTH_KEYS = {
   emailConfig: ["auth", "email-config"] as const,
 
   // Child keys (functions for specific queries)
+  /** 前缀键：invalidate 时能命中所有用户的 hasPassword 查询 */
+  hasPasswordRoot: ["auth", "has-password"] as const,
   hasPassword: (userId?: string) => ["auth", "has-password", userId] as const,
 };
 

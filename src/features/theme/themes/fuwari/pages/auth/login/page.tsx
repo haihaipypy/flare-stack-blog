@@ -144,6 +144,14 @@ export function LoginPage({
 
         {turnstileElement}
 
+        {/* GitHub 注册的老账号没有密码，给一条明确指引，
+            否则他们会一直卡在「无效的账号或密码」 */}
+        {isEmailConfigured && (
+          <p className="text-xs leading-relaxed fuwari-text-30 text-center px-2">
+            {m.login_hint_github_password()}
+          </p>
+        )}
+
         {/* Footer Link */}
         {isEmailConfigured && (
           <div className="text-center pt-2">

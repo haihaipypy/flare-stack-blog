@@ -28,12 +28,16 @@ export interface ProfileFormData {
 }
 
 export interface PasswordSchema {
-  currentPassword: string;
+  /** 仅在 `change` 模式下必填；`set` 模式（如 GitHub 注册的账号）没有密码可填 */
+  currentPassword?: string;
   newPassword: string;
   confirmPassword: string;
 }
 
+export type PasswordFormMode = "set" | "change";
+
 export interface PasswordFormData {
+  mode: PasswordFormMode;
   register: UseFormRegister<PasswordSchema>;
   errors: FieldErrors<PasswordSchema>;
   handleSubmit: (e?: React.BaseSyntheticEvent) => Promise<void>;

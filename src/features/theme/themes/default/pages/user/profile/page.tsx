@@ -177,24 +177,33 @@ export function ProfilePage({
             <div className="w-full h-px bg-border/40" />
             <section className="space-y-8">
               <h3 className="text-lg font-serif font-medium text-foreground">
-                {m.profile_security_settings()}
+                {passwordForm.mode === "set"
+                  ? m.profile_password_set_title()
+                  : m.profile_security_settings()}
               </h3>
+              {passwordForm.mode === "set" && (
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  {m.profile_password_set_desc({ email: user.email })}
+                </p>
+              )}
               <form onSubmit={passwordForm.handleSubmit} className="space-y-6">
-                <div className="space-y-2 group">
-                  <label className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider group-focus-within:text-foreground transition-colors">
-                    {m.profile_current_password()}
-                  </label>
-                  <Input
-                    type="password"
-                    {...passwordForm.register("currentPassword")}
-                    className="bg-transparent border-0 border-b border-border text-foreground font-sans text-sm px-0 rounded-none focus-visible:ring-0 focus-visible:border-foreground transition-all placeholder:text-muted-foreground/30 shadow-none h-auto py-2"
-                  />
-                  {passwordForm.errors.currentPassword && (
-                    <span className="text-[10px] text-destructive font-mono">
-                      {passwordForm.errors.currentPassword.message}
-                    </span>
-                  )}
-                </div>
+                {passwordForm.mode === "change" && (
+                  <div className="space-y-2 group">
+                    <label className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider group-focus-within:text-foreground transition-colors">
+                      {m.profile_current_password()}
+                    </label>
+                    <Input
+                      type="password"
+                      {...passwordForm.register("currentPassword")}
+                      className="bg-transparent border-0 border-b border-border text-foreground font-sans text-sm px-0 rounded-none focus-visible:ring-0 focus-visible:border-foreground transition-all placeholder:text-muted-foreground/30 shadow-none h-auto py-2"
+                    />
+                    {passwordForm.errors.currentPassword && (
+                      <span className="text-[10px] text-destructive font-mono">
+                        {passwordForm.errors.currentPassword.message}
+                      </span>
+                    )}
+                  </div>
+                )}
 
                 <div className="space-y-2 group">
                   <label className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider group-focus-within:text-foreground transition-colors">
@@ -241,7 +250,11 @@ export function ProfilePage({
                         {m.profile_updating()}
                       </span>
                     ) : (
-                      `[ ${m.profile_update_password()} ]`
+                      `[ ${
+                        passwordForm.mode === "set"
+                          ? m.profile_set_password()
+                          : m.profile_update_password()
+                      } ]`
                     )}
                   </Button>
                 </div>

@@ -40,6 +40,12 @@ export function LoginPage({
         {turnstileElement}
 
         {isEmailConfigured && (
+          <p className="text-[10px] font-mono text-muted-foreground/40 tracking-wider leading-relaxed text-center pt-6">
+            {m.login_hint_github_password()}
+          </p>
+        )}
+
+        {isEmailConfigured && (
           <div className="text-center pt-8">
             <p className="text-[10px] font-mono text-muted-foreground/50 tracking-wider">
               {m.login_no_account()}{" "}
