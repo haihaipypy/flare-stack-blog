@@ -1,14 +1,19 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getRouteApi } from "@tanstack/react-router";
 import { AlertTriangle, UserRound } from "lucide-react";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { AdminPagination } from "@/components/admin/admin-pagination";
 import { Input } from "@/components/ui/input";
 import {
   avatarSeedForUser,
   buildAvatarUrl,
 } from "@/features/avatar/avatar.url";
-import { usersQueryOptions } from "@/features/users/queries";
+import {
+  markUserUnverifiedFn,
+  resendUserVerificationFn,
+} from "@/features/users/api/users.api";
+import { USERS_KEYS, usersQueryOptions } from "@/features/users/queries";
 import type {
   UserFilter,
   UserListItem,
@@ -126,6 +131,9 @@ export function UserList({
                 <th className="hidden md:table-cell py-3 text-right text-[9px] font-mono uppercase tracking-[0.2em] text-muted-foreground">
                   {m.users_col_joined()}
                 </th>
+                <th className="py-3 text-right text-[9px] font-mono uppercase tracking-[0.2em] text-muted-foreground">
+                  {m.users_col_actions()}
+                </th>
               </tr>
             </thead>
             <tbody>
@@ -212,10 +220,76 @@ function UserRow({ item }: { item: UserListItem }) {
         </span>
       </td>
 
-      <td className="hidden md:table-cell py-3 text-right text-[10px] font-mono text-muted-foreground whitespace-nowrap">
+      <td className="hidden md:table-cell py-3 pr-4 text-right text-[10px] font-mono text-muted-foreground whitespace-nowrap">
         {formatDate(item.createdAt)}
       </td>
+
+      <td className="py-3">
+        <UserActions item={item} />
+      </td>
     </tr>
+  );
+}
+
+function UserActions({ item }: { item: UserListItem }) {
+  const queryClient = useQueryClient();
+  const invalidate = () =>
+    queryClient.invalidateQueries({ queryKey: USERS_KEYS.all });
+
+  const resend = useMutation({
+    mutationFn: () => resendUserVerificationFn({ data: { id: item.id } }),
+    onSuccess: (result) => {
+      if (result.ok) {
+        toast.success(m.users_toast_resend_ok());
+        void invalidate();
+      } else {
+        toast.error(m.users_toast_resend_failed());
+      }
+    },
+    onError: (error) =>
+      toast.error(m.users_toast_resend_failed(), {
+        description: error instanceof Error ? error.message : undefined,
+      }),
+  });
+
+  const unverify = useMutation({
+    mutationFn: () => markUserUnverifiedFn({ data: { id: item.id } }),
+    onSuccess: (result) => {
+      if (result.ok) {
+        toast.success(m.users_toast_unverify_ok());
+        void invalidate();
+      } else {
+        toast.error(m.users_toast_action_failed());
+      }
+    },
+    onError: () => toast.error(m.users_toast_action_failed()),
+  });
+
+  const buttonClass =
+    "border border-border/50 px-2 py-1 text-[9px] font-mono uppercase tracking-wider text-muted-foreground transition-colors hover:border-foreground/60 hover:text-foreground disabled:opacity-40 disabled:hover:border-border/50 disabled:hover:text-muted-foreground";
+
+  return (
+    <div className="flex items-center justify-end gap-2 whitespace-nowrap">
+      <button
+        type="button"
+        disabled={resend.isPending}
+        onClick={() => resend.mutate()}
+        className={buttonClass}
+      >
+        {m.users_action_resend()}
+      </button>
+
+      {item.emailVerified ? (
+        <button
+          type="button"
+          disabled={unverify.isPending}
+          onClick={() => unverify.mutate()}
+          className={buttonClass}
+        >
+          {m.users_action_unverify()}
+        </button>
+      ) : null}
+    </div>
   );
 }
 

@@ -1675,5 +1675,12 @@
   "users_count_info": "{total} users",
   "auth_error_password_already_set": "This account already has a password. Sign in with your email and password, or change it here.",
   "profile_toast_password_set_unverified": "Password set, but this account's email is not verified yet. Verify it from your inbox before signing in with email and password.",
-  "login_hint_github_password": "Accounts created with GitHub have no password yet. Sign in once, set one in your profile, then you can sign in with your email and password."
+  "login_hint_github_password": "Accounts created with GitHub have no password yet. Sign in once, set one in your profile, then you can sign in with your email and password.",
+  "users_col_actions": "Actions",
+  "users_action_resend": "Resend",
+  "users_action_unverify": "Unverify",
+  "users_toast_resend_ok": "Verification email sent",
+  "users_toast_resend_failed": "Failed to send. Check mail settings and rate limit.",
+  "users_toast_unverify_ok": "Marked as unverified",
+  "users_toast_action_failed": "Action failed, please retry"
 }

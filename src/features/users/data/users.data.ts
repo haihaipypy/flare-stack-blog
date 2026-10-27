@@ -75,8 +75,9 @@ export async function getUsers(
   }));
 }
 
-/** 一次聚合拿到四个口径的计数，避免四次 round-trip */
-export async function getUsersStats(db: DB): Promise<UserStats> {
+/** 一次聚合拿到四个口径的计数，避免四次 round-trip */ export async function getUsersStats(
+  db: DB,
+): Promise<UserStats> {
   const [row] = await db
     .select({
       total: count(),
@@ -98,4 +99,32 @@ export async function getUsersStats(db: DB): Promise<UserStats> {
     unverified: Math.max(total - verified, 0),
     admins: Number(row?.admins ?? 0),
   };
+}
+
+export async function findUserById(
+  db: DB,
+  id: string,
+): Promise<{ id: string; email: string; emailVerified: boolean } | null> {
+  const [row] = await db
+    .select({
+      id: UserTable.id,
+      email: UserTable.email,
+      emailVerified: UserTable.emailVerified,
+    })
+    .from(UserTable)
+    .where(eq(UserTable.id, id))
+    .limit(1);
+
+  return row ?? null;
+}
+
+export async function setEmailVerified(
+  db: DB,
+  id: string,
+  emailVerified: boolean,
+): Promise<void> {
+  await db
+    .update(UserTable)
+    .set({ emailVerified, updatedAt: new Date() })
+    .where(eq(UserTable.id, id));
 }

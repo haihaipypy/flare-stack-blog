@@ -1,6 +1,8 @@
 import * as UserRepo from "@/features/users/data/users.data";
 import type {
   GetUsersInput,
+  UserActionResult,
+  UserIdInput,
   UserListResult,
 } from "@/features/users/users.schema";
 
@@ -41,4 +43,55 @@ export async function getUsers(
     totalPages,
     stats,
   };
+}
+
+/**
+ * 重发验证邮件。
+ *
+ * 关键点：better-auth 的 `/send-verification-email` 在 `emailVerified === true`
+ * 时直接 `return { status: true }`，**不会调用 sendVerificationEmail**
+ * （node_modules/better-auth/dist/api/routes/email-verification.mjs:99-102）。
+ * 所以后台点「重发」时必须先把标记落回 false，否则前端拿到成功、Resend 里一片空白。
+ */
+export async function resendVerificationEmail(
+  context: AuthContext,
+  input: UserIdInput,
+): Promise<UserActionResult> {
+  const user = await UserRepo.findUserById(context.db, input.id);
+  if (!user) return { ok: false, reason: "USER_NOT_FOUND" };
+
+  if (user.emailVerified) {
+    await UserRepo.setEmailVerified(context.db, user.id, false);
+  }
+
+  try {
+    await context.auth.api.sendVerificationEmail({
+      body: { email: user.email },
+    });
+    return { ok: true };
+  } catch (error) {
+    console.error(
+      JSON.stringify({
+        message: "admin resend verification failed",
+        userId: user.id,
+        error: error instanceof Error ? error.message : String(error),
+      }),
+    );
+    return { ok: false, reason: "SEND_FAILED" };
+  }
+}
+
+/** 只把标记改成未验证，不发信 —— 用于修正历史脏数据 */
+export async function markEmailUnverified(
+  context: DbContext,
+  input: UserIdInput,
+): Promise<UserActionResult> {
+  const user = await UserRepo.findUserById(context.db, input.id);
+  if (!user) return { ok: false, reason: "USER_NOT_FOUND" };
+
+  if (user.emailVerified) {
+    await UserRepo.setEmailVerified(context.db, user.id, false);
+  }
+
+  return { ok: true };
 }

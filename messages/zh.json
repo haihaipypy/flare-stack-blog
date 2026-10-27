@@ -1667,5 +1667,12 @@
   "users_count_info": "共 {total} 位用户",
   "auth_error_password_already_set": "这个账号已经设置过密码了，可以直接用邮箱 + 密码登录，也可以在这里修改密码。",
   "profile_toast_password_set_unverified": "密码已设置，但这个账号的邮箱还没验证。请先到邮箱点验证链接，之后才能用邮箱 + 密码登录。",
-  "login_hint_github_password": "之前用 GitHub 登录的账号还没有密码。先登录一次，到「个人中心」设置密码，之后就能用邮箱 + 密码登录。"
+  "login_hint_github_password": "之前用 GitHub 登录的账号还没有密码。先登录一次，到「个人中心」设置密码，之后就能用邮箱 + 密码登录。",
+  "users_col_actions": "操作",
+  "users_action_resend": "重发邮件",
+  "users_action_unverify": "设为未验证",
+  "users_toast_resend_ok": "验证邮件已发送",
+  "users_toast_resend_failed": "发送失败，请检查邮件配置与发信限流",
+  "users_toast_unverify_ok": "已标记为未验证",
+  "users_toast_action_failed": "操作失败，请重试"
 }

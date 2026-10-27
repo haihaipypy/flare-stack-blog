@@ -13,6 +13,17 @@ export const GetUsersInputSchema = z.object({
 
 export type GetUsersInput = z.infer<typeof GetUsersInputSchema>;
 
+export const UserIdInputSchema = z.object({
+  id: z.string().min(1),
+});
+
+export type UserIdInput = z.infer<typeof UserIdInputSchema>;
+
+/** 后台对单个用户的操作结果：不抛错，交给前端按 reason 出文案 */
+export type UserActionResult =
+  | { ok: true }
+  | { ok: false; reason: "USER_NOT_FOUND" | "SEND_FAILED" };
+
 export type UserListItem = {
   id: string;
   name: string;
