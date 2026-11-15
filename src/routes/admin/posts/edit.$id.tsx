@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { useRef } from "react";
 import { setPostCategoriesFn } from "@/features/categories/api/categories.api";
 import {
   CATEGORIES_KEYS,
@@ -9,8 +10,12 @@ import {
 import { MEDIA_KEYS } from "@/features/media/queries";
 import { updatePostFn as adminUpdatePostFn } from "@/features/posts/api/posts.admin.api";
 import { PostEditor } from "@/features/posts/components/post-editor";
+import { PostSaveConflictError } from "@/features/posts/components/post-editor/conflict";
 import { PostEditorSkeleton } from "@/features/posts/components/post-editor/post-editor-skeleton";
-import type { PostEditorData } from "@/features/posts/components/post-editor/types";
+import type {
+  PostEditorData,
+  PostSaveOptions,
+} from "@/features/posts/components/post-editor/types";
 import { POSTS_KEYS, postByIdQuery } from "@/features/posts/queries";
 import { setPostTagsFn } from "@/features/tags/api/tags.api";
 import {
@@ -59,6 +64,12 @@ function EditPost() {
   const { data: tags } = useQuery(tagsByPostIdQueryOptions(postId));
   const { data: categories } = useQuery(categoriesByPostIdQueryOptions(postId));
 
+  // 乐观锁基准：本次编辑会话里服务端最后一次确认的 updatedAt（Unix 秒）
+  const expectedUpdatedAtRef = useRef<number | null>(null);
+  if (post && expectedUpdatedAtRef.current === null) {
+    expectedUpdatedAtRef.current = Math.floor(post.updatedAt.getTime() / 1000);
+  }
+
   if (!post || !tags || !categories) {
     return (
       <div className="flex items-center justify-center h-[50vh]">
@@ -90,40 +101,62 @@ function EditPost() {
     hasPublicCache: post.hasPublicCache,
   };
 
-  const handleSave = async (data: PostEditorData) => {
+  const handleSave = async (
+    data: PostEditorData,
+    options?: PostSaveOptions,
+  ) => {
     const publishedAt =
       data.status === "published" && !post.publishedAt
         ? new Date()
         : data.publishedAt;
 
-    // Parallelize updates
-    const [updateResult] = await Promise.all([
-      adminUpdatePostFn({
+    // 先写正文：带上打开编辑器时读到的 updatedAt，被别人改过就不落库
+    const updateResult = await adminUpdatePostFn({
+      data: {
+        id: post.id,
+        expectedUpdatedAt: options?.force
+          ? undefined
+          : (expectedUpdatedAtRef.current ?? undefined),
         data: {
-          id: post.id,
-          data: {
-            ...data,
-            publishedAt,
-          },
+          ...data,
+          publishedAt,
         },
-      }),
+      },
+    });
+
+    if (updateResult.error) {
+      if (updateResult.error.reason === "POST_CONFLICT") {
+        throw new PostSaveConflictError(
+          updateResult.error.currentUpdatedAt ?? null,
+        );
+      }
+      throw new Error(m.admin_post_edit_error_not_found());
+    }
+
+    if (updateResult.data?.updatedAt) {
+      expectedUpdatedAtRef.current = Math.floor(
+        new Date(updateResult.data.updatedAt).getTime() / 1000,
+      );
+    }
+
+    // 标签/分类放到正文之后，并跳过它们对 updated_at 的 touch，
+    // 否则下次保存的乐观锁基准就对不上了。
+    await Promise.all([
       setPostTagsFn({
         data: {
           postId: post.id,
           tagIds: data.tagIds,
+          skipTouch: true,
         },
       }),
       setPostCategoriesFn({
         data: {
           postId: post.id,
           categoryIds: data.categoryIds,
+          skipTouch: true,
         },
       }),
     ]);
-
-    if (updateResult.error) {
-      throw new Error(m.admin_post_edit_error_not_found());
-    }
 
     // Invalidate cache to ensure fresh data on next visit
     queryClient.invalidateQueries({ queryKey: POSTS_KEYS.detail(postId) });

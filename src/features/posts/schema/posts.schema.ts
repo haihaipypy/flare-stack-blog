@@ -132,6 +132,11 @@ export const FindPostByIdInputSchema = z.object({ id: z.number() });
 export const UpdatePostInputSchema = z.object({
   id: z.number(),
   data: PostUpdateSchema,
+  /**
+   * 客户端打开编辑器时读到的 updatedAt（Unix 秒）。
+   * 传了就做乐观锁：库里已被别人改过则返回 POST_CONFLICT，而不是静默覆盖。
+   */
+  expectedUpdatedAt: z.number().int().optional(),
 });
 
 export const DeletePostInputSchema = z.object({ id: z.number() });

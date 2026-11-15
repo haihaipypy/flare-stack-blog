@@ -447,8 +447,20 @@ export async function updatePost(
   db: DB,
   id: number,
   data: Partial<Omit<typeof PostsTable.$inferInsert, "id" | "createdAt">>,
+  expectedUpdatedAt?: Date,
 ) {
-  await db.update(PostsTable).set(data).where(eq(PostsTable.id, id));
+  // 带 expectedUpdatedAt 时做乐观锁：期间被别人改过就一条都不更新。
+  const condition = expectedUpdatedAt
+    ? and(eq(PostsTable.id, id), eq(PostsTable.updatedAt, expectedUpdatedAt))
+    : eq(PostsTable.id, id);
+
+  const updated = await db
+    .update(PostsTable)
+    .set(data)
+    .where(condition)
+    .returning({ id: PostsTable.id });
+
+  if (updated.length === 0) return null;
   return await findPostById(db, id);
 }
 
@@ -588,7 +600,10 @@ export async function findAdjacentPublicPosts(
   slug: string,
 ): Promise<AdjacentPublicPosts> {
   const current = await db.query.PostsTable.findFirst({
-    where: and(eq(PostsTable.slug, slug), buildPostWhereClause({ publicOnly: true })),
+    where: and(
+      eq(PostsTable.slug, slug),
+      buildPostWhereClause({ publicOnly: true }),
+    ),
     columns: { id: true, publishedAt: true },
   });
 
@@ -607,10 +622,7 @@ export async function findAdjacentPublicPosts(
         publicOnly,
         or(
           gt(PostsTable.publishedAt, publishedAt),
-          and(
-            eq(PostsTable.publishedAt, publishedAt),
-            gt(PostsTable.id, id),
-          ),
+          and(eq(PostsTable.publishedAt, publishedAt), gt(PostsTable.id, id)),
         ),
       ),
     )
@@ -625,10 +637,7 @@ export async function findAdjacentPublicPosts(
         publicOnly,
         or(
           lt(PostsTable.publishedAt, publishedAt),
-          and(
-            eq(PostsTable.publishedAt, publishedAt),
-            lt(PostsTable.id, id),
-          ),
+          and(eq(PostsTable.publishedAt, publishedAt), lt(PostsTable.id, id)),
         ),
       ),
     )

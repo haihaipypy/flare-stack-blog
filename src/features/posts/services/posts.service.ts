@@ -359,9 +359,28 @@ export async function updatePost(
   context: DbContext & { executionCtx: ExecutionContext; env?: Env },
   data: UpdatePostInput,
 ) {
-  const updatedPost = await PostRepo.updatePost(context.db, data.id, data.data);
+  const expectedUpdatedAt =
+    typeof data.expectedUpdatedAt === "number"
+      ? new Date(data.expectedUpdatedAt * 1000)
+      : undefined;
+
+  const updatedPost = await PostRepo.updatePost(
+    context.db,
+    data.id,
+    data.data,
+    expectedUpdatedAt,
+  );
+
   if (!updatedPost) {
-    return err({ reason: "POST_NOT_FOUND" });
+    // 区分「文章不存在」与「被别处改过」：前者直接报错，后者让前端提示用户选择。
+    const current = await PostRepo.findPostById(context.db, data.id);
+    if (!current) {
+      return err({ reason: "POST_NOT_FOUND" });
+    }
+    return err({
+      reason: "POST_CONFLICT",
+      currentUpdatedAt: Math.floor(current.updatedAt.getTime() / 1000),
+    });
   }
 
   if (data.data.contentJson !== undefined) {

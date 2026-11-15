@@ -45,6 +45,11 @@ export const GetTagsInputSchema = z.object({
 export const SetPostTagsInputSchema = z.object({
   postId: z.number(),
   tagIds: z.array(z.number()),
+  /**
+   * 编辑页保存时，文章本体的 update 已经刷新过 updated_at，
+   * 这里再 touch 一次会打乱乐观锁的时间戳，故允许跳过。
+   */
+  skipTouch: z.boolean().optional(),
 });
 
 export const GetTagsByPostIdInputSchema = z.object({

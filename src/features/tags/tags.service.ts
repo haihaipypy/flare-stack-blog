@@ -223,7 +223,9 @@ export async function deleteTag(
  */
 export async function setPostTags(context: DbContext, data: SetPostTagsInput) {
   await TagRepo.setPostTags(context.db, data.postId, data.tagIds);
-  await PostRepo.touchPostUpdatedAt(context.db, data.postId);
+  if (!data.skipTouch) {
+    await PostRepo.touchPostUpdatedAt(context.db, data.postId);
+  }
   await PostAutoSnapshotService.enqueuePostAutoSnapshot(context, {
     postId: data.postId,
     source: "tag_update",

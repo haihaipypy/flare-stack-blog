@@ -16,12 +16,17 @@ export interface PostEditorData {
   hasPublicCache: boolean;
 }
 
-export interface PostEditorProps {
-  initialData: PostEditorData & { id: number };
-  onSave: (data: PostEditorData) => Promise<void>;
+export interface PostSaveOptions {
+  /** 跳过乐观锁，直接用本地内容覆盖服务端（用户已在冲突提示里确认） */
+  force?: boolean;
 }
 
-export type SaveStatus = "SYNCED" | "SAVING" | "PENDING" | "ERROR";
+export interface PostEditorProps {
+  initialData: PostEditorData & { id: number };
+  onSave: (data: PostEditorData, options?: PostSaveOptions) => Promise<void>;
+}
+
+export type SaveStatus = "SYNCED" | "SAVING" | "PENDING" | "ERROR" | "CONFLICT";
 
 export const defaultPostData: PostEditorData = {
   title: "",

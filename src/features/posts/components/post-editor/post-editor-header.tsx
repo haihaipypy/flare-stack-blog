@@ -1,11 +1,11 @@
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { Button } from "@/components/ui/button";
 import { m } from "@/paraglide/messages";
-import type { PostEditorData } from "./types";
+import type { PostEditorData, SaveStatus } from "./types";
 
 interface PostEditorHeaderProps {
   post: PostEditorData;
-  saveStatus: "SYNCED" | "SAVING" | "PENDING" | "ERROR";
+  saveStatus: SaveStatus;
   processState: "IDLE" | "PROCESSING" | "SUCCESS";
   isPostDirty: boolean;
   onPreview: () => void;

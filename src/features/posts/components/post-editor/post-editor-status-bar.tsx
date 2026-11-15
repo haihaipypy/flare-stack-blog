@@ -17,6 +17,13 @@ export function PostEditorStatusBar({
 }: PostEditorStatusBarProps) {
   const renderStatus = () => {
     switch (saveStatus) {
+      case "CONFLICT":
+        return (
+          <span className="flex items-center gap-2 font-medium text-amber-600">
+            <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+            {m.editor_status_conflict()}
+          </span>
+        );
       case "ERROR":
         return (
           <span className="flex items-center gap-2 font-medium text-red-500">

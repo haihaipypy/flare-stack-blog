@@ -286,7 +286,9 @@ export async function setPostCategories(
     data.postId,
     data.categoryIds,
   );
-  await PostRepo.touchPostUpdatedAt(context.db, data.postId);
+  if (!data.skipTouch) {
+    await PostRepo.touchPostUpdatedAt(context.db, data.postId);
+  }
 
   context.executionCtx.waitUntil(
     Promise.all([

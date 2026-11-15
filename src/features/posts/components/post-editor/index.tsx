@@ -12,6 +12,7 @@ import { tagsAdminQueryOptions } from "@/features/tags/queries";
 import { m } from "@/paraglide/messages";
 import { EditorTableOfContents } from "./editor-table-of-contents";
 import { useAutoSave, usePostActions } from "./hooks";
+import { PostEditorConflictBanner } from "./post-editor-conflict-banner";
 import { PostEditorHeader } from "./post-editor-header";
 import { PostEditorHistoryPanel } from "./post-editor-history-panel";
 import { PostEditorMetadata } from "./post-editor-metadata";
@@ -65,15 +66,24 @@ export function PostEditor({ initialData, onSave }: PostEditorProps) {
   const { data: allTags = [] } = useQuery(tagsAdminQueryOptions());
 
   // Auto-save hook
+  const [conflict, setConflict] = useState<{
+    currentUpdatedAt: number | null;
+  } | null>(null);
+
+  const handleConflict = useCallback((currentUpdatedAt: number | null) => {
+    setConflict((prev) => prev ?? { currentUpdatedAt });
+  }, []);
+
   const useAutoSaveReturn = useAutoSave({
     post,
     onSave,
+    onConflict: handleConflict,
   });
 
   const { saveStatus, lastSaved, setError, markSaved } = useAutoSaveReturn;
 
   const { proceed, reset, status } = useBlocker({
-    shouldBlockFn: () => saveStatus === "SAVING",
+    shouldBlockFn: () => saveStatus === "SAVING" || saveStatus === "CONFLICT",
     withResolver: true,
   });
 
@@ -106,6 +116,24 @@ export function PostEditor({ initialData, onSave }: PostEditorProps) {
 
   const handlePostChange = useCallback((updates: Partial<PostEditorData>) => {
     setPost((prev) => ({ ...prev, ...updates }));
+  }, []);
+
+  // 用户确认用自己的版本覆盖服务端内容
+  const handleOverwriteConflict = useCallback(async () => {
+    try {
+      await onSave(post, { force: true });
+      markSaved(post);
+      setConflict(null);
+    } catch (err) {
+      console.error("Force save failed:", err);
+      setError("AUTO_SAVE_FAILED");
+      throw err;
+    }
+  }, [markSaved, onSave, post, setError]);
+
+  const handleDiscardConflict = useCallback(() => {
+    // 本地改动作废，重新拉取服务端最新内容
+    window.location.reload();
   }, []);
 
   const handleRestoreApplied = useCallback(
@@ -192,6 +220,14 @@ export function PostEditor({ initialData, onSave }: PostEditorProps) {
         }}
         onProcess={handleProcessData}
       />
+
+      {conflict && (
+        <PostEditorConflictBanner
+          currentUpdatedAt={conflict.currentUpdatedAt}
+          onOverwrite={handleOverwriteConflict}
+          onDiscard={handleDiscardConflict}
+        />
+      )}
 
       <PostEditorHistoryPanel
         postId={initialData.id}

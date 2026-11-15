@@ -1,9 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import type { PostEditorData, SaveStatus } from "../types";
+import { isPostSaveConflictError } from "../conflict";
+import type { PostEditorData, PostSaveOptions, SaveStatus } from "../types";
 
 interface UseAutoSaveOptions {
   post: PostEditorData;
-  onSave: (data: PostEditorData) => Promise<void>;
+  onSave: (data: PostEditorData, options?: PostSaveOptions) => Promise<void>;
+  /** 检测到别处改过这篇文章时调用，此时自动保存会暂停，等用户决定 */
+  onConflict?: (currentUpdatedAt: number | null) => void;
   debounceMs?: number;
 }
 
@@ -20,6 +23,7 @@ interface UseAutoSaveReturn {
 export function useAutoSave({
   post,
   onSave,
+  onConflict,
   debounceMs = 1500,
 }: UseAutoSaveOptions): UseAutoSaveReturn {
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("SYNCED");
@@ -29,6 +33,8 @@ export function useAutoSave({
   const isFirstMount = useRef(true);
   const isMounted = useRef(false);
   const isSaving = useRef(false);
+  // 冲突未解决前不再自动重试，否则每次敲字都会再打一次请求
+  const isPaused = useRef(false);
   const latestPostRef = useRef(post);
   const retryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // Track last-saved snapshot (shallow)
@@ -46,6 +52,8 @@ export function useAutoSave({
   // Store onSave in ref to avoid effect re-running when onSave reference changes
   const onSaveRef = useRef(onSave);
   onSaveRef.current = onSave;
+  const onConflictRef = useRef(onConflict);
+  onConflictRef.current = onConflict;
 
   const toComparable = (p: PostEditorData) => ({
     title: p.title,
@@ -82,6 +90,7 @@ export function useAutoSave({
     }
     latestPostRef.current = savedPost;
     lastSavedSnapshot.current = toComparable(savedPost);
+    isPaused.current = false;
     setError(null);
     setSaveStatus("SYNCED");
     setLastSaved(new Date());
@@ -115,10 +124,16 @@ export function useAutoSave({
       return;
     }
 
+    // 冲突未解决时保持 CONFLICT 状态，不要显示成「保存中」
+    if (isPaused.current) {
+      setSaveStatus("CONFLICT");
+      return;
+    }
+
     setSaveStatus("SAVING");
 
     const attemptSave = async () => {
-      if (isSaving.current) return;
+      if (isSaving.current || isPaused.current) return;
       isSaving.current = true;
 
       try {
@@ -146,6 +161,15 @@ export function useAutoSave({
           setSaveStatus("SYNCED");
         }
       } catch (err) {
+        if (isPostSaveConflictError(err)) {
+          // 别处改过：暂停自动保存，交给 UI 让用户选择覆盖还是丢弃
+          isPaused.current = true;
+          if (isMounted.current) {
+            setSaveStatus("CONFLICT");
+            onConflictRef.current?.(err.currentUpdatedAt);
+          }
+          return;
+        }
         console.error("Auto-save failed:", err);
         setSaveStatus("ERROR");
         setError("AUTO_SAVE_FAILED");

@@ -35,6 +35,11 @@ export const GetCategoriesInputSchema = z.object({
 export const SetPostCategoriesInputSchema = z.object({
   postId: z.number(),
   categoryIds: z.array(z.number()),
+  /**
+   * 编辑页保存时，文章本体的 update 已经刷新过 updated_at，
+   * 这里再 touch 一次会打乱乐观锁的时间戳，故允许跳过。
+   */
+  skipTouch: z.boolean().optional(),
 });
 export const GetCategoriesByPostIdInputSchema = z.object({
   postId: z.number(),
