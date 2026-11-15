@@ -27,3 +27,7 @@ docs/superpowers/
 .opencode-lark/
 # 工具删除文件时的本地回收站
 .Trash-*/
+# 上游代码调研素材（本地临时，不参与版本控制）
+.scratch/cf-stats-review/
+.scratch/up13/
+.scratch/upstream-*/
