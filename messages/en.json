@@ -1682,5 +1682,26 @@
   "users_toast_resend_ok": "Verification email sent",
   "users_toast_resend_failed": "Failed to send. Check mail settings and rate limit.",
   "users_toast_unverify_ok": "Marked as unverified",
-  "users_toast_action_failed": "Action failed, please retry"
+  "users_toast_action_failed": "Action failed, please retry",
+  "settings_site_banner_focus": "Banner focus",
+  "settings_site_banner_focus_hint": "Drag the image to pick its focal point, so wide banners keep their subject when cropped on narrow screens",
+  "settings_site_banner_focus_reset": "Reset to center",
+  "settings_site_banner_focus_empty": "Add a banner image above first, then adjust its focus",
+  "settings_site_validation_focus_range": "Value must be between 0 and 100",
+  "settings_site_validation_focus_invalid": "Enter a number between 0 and 100",
+  "editor_conflict_title": "This post was changed in another window",
+  "editor_conflict_desc": [
+    {
+      "declarations": [
+        "input time"
+      ],
+      "match": {
+        "time=*": "Last saved at {time}. Auto-save is paused."
+      }
+    }
+  ],
+  "editor_conflict_desc_unknown": "The server copy changed. Auto-save is paused.",
+  "editor_conflict_overwrite": "Overwrite with mine",
+  "editor_conflict_discard": "Discard my changes",
+  "editor_status_conflict": "Conflict"
 }

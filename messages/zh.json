@@ -1674,5 +1674,26 @@
   "users_toast_resend_ok": "验证邮件已发送",
   "users_toast_resend_failed": "发送失败，请检查邮件配置与发信限流",
   "users_toast_unverify_ok": "已标记为未验证",
-  "users_toast_action_failed": "操作失败，请重试"
+  "users_toast_action_failed": "操作失败，请重试",
+  "settings_site_banner_focus": "封面焦点",
+  "settings_site_banner_focus_hint": "拖动画面选择视觉重心，宽图在窄屏被裁切时能保住主体",
+  "settings_site_banner_focus_reset": "重置居中",
+  "settings_site_banner_focus_empty": "先填写或上传封面图，再来调整焦点",
+  "settings_site_validation_focus_range": "取值范围应在 0 到 100 之间",
+  "settings_site_validation_focus_invalid": "请输入 0 到 100 之间的数字",
+  "editor_conflict_title": "这篇文章已被其他窗口修改",
+  "editor_conflict_desc": [
+    {
+      "declarations": [
+        "input time"
+      ],
+      "match": {
+        "time=*": "最近保存于 {time}，自动保存已暂停"
+      }
+    }
+  ],
+  "editor_conflict_desc_unknown": "服务端内容已变化，自动保存已暂停",
+  "editor_conflict_overwrite": "用我的版本覆盖",
+  "editor_conflict_discard": "放弃本地改动",
+  "editor_status_conflict": "存在冲突"
 }
