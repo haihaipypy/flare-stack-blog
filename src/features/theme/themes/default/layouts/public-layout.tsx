@@ -18,7 +18,10 @@ export function PublicLayout({
 
   return (
     <div className="default-theme min-h-screen flex flex-col">
-      <BackgroundLayer background={siteConfig.theme.default.background} />
+      <BackgroundLayer
+        background={siteConfig.theme.default.background}
+        focus={siteConfig.bannerFocus}
+      />
       <Navbar
         navOptions={navOptions}
         onMenuClick={() => setIsMenuOpen(true)}

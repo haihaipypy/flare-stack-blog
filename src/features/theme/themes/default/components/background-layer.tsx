@@ -1,6 +1,7 @@
 import { useRouterState } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
 import type { DefaultThemeBackground } from "@/features/config/site-config.schema";
+import { bannerObjectPosition } from "@/features/config/site-config.schema";
 
 const baseStyle: React.CSSProperties = {
   position: "fixed",
@@ -11,8 +12,10 @@ const baseStyle: React.CSSProperties = {
 
 export function BackgroundLayer({
   background,
+  focus,
 }: {
   background?: DefaultThemeBackground;
+  focus?: { x: number; y: number };
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const pathname = useRouterState({
@@ -54,7 +57,7 @@ export function BackgroundLayer({
   const imageStyle: React.CSSProperties = {
     ...baseStyle,
     backgroundSize: "cover",
-    backgroundPosition: "center",
+    backgroundPosition: bannerObjectPosition(focus),
     backgroundRepeat: "no-repeat",
     filter: backdropBlur ? `blur(${backdropBlur}px)` : undefined,
   };

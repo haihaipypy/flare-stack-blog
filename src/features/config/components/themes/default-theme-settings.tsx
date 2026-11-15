@@ -1,6 +1,7 @@
 import { useFormContext } from "react-hook-form";
 import { Input } from "@/components/ui/input";
 import { AssetUploadField } from "@/features/config/components/asset-upload-field";
+import { BannerFocusField } from "@/features/config/components/banner-focus-field";
 import {
   Field,
   RangeField,
@@ -57,6 +58,11 @@ export function DefaultThemeSettings() {
         hint={m.settings_site_field_global_image_hint()}
         placeholder="/images/asset/themes/default/global-image.webp or https://picsum.photos/1600/900"
         error={errors.site?.theme?.default?.background?.globalImage?.message}
+      />
+      <BannerFocusField
+        imageName="site.theme.default.background.homeImage"
+        label={m.settings_site_banner_focus()}
+        hint={m.settings_site_banner_focus_hint()}
       />
       <RangeField
         name="site.theme.default.background.light.opacity"

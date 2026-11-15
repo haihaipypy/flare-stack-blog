@@ -1,6 +1,7 @@
 import "@/features/theme/themes/fuwari/styles/preview.css";
 import { useFormContext, useWatch } from "react-hook-form";
 import { AssetUploadField } from "@/features/config/components/asset-upload-field";
+import { BannerFocusField } from "@/features/config/components/banner-focus-field";
 import { RangeField } from "@/features/config/components/site-settings-fields";
 import type { SystemConfig } from "@/features/config/config.schema";
 import {
@@ -94,6 +95,11 @@ export function FuwariThemeSettings() {
         hint={m.settings_site_field_home_image_hint()}
         placeholder="/images/asset/themes/fuwari/home-bg.webp or https://picsum.photos/1600/900"
         error={errors.site?.theme?.fuwari?.homeBg?.message}
+      />
+      <BannerFocusField
+        imageName="site.theme.fuwari.homeBg"
+        label={m.settings_site_banner_focus()}
+        hint={m.settings_site_banner_focus_hint()}
       />
       <AssetUploadField
         name="site.theme.fuwari.avatar"

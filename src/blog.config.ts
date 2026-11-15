@@ -32,4 +32,5 @@ export const blogConfig = {
       primaryHue: 250,
     },
   },
+  bannerFocus: { x: 50, y: 50 },
 } as const satisfies SiteConfig;

@@ -7,7 +7,10 @@ import {
   SystemConfigSchema,
 } from "@/features/config/config.schema";
 import * as ConfigRepo from "@/features/config/data/config.data";
-import { FullSiteConfigSchema } from "@/features/config/site-config.schema";
+import {
+  DEFAULT_BANNER_FOCUS,
+  FullSiteConfigSchema,
+} from "@/features/config/site-config.schema";
 import type { SocialLink } from "@/features/config/utils/social-platforms";
 import * as Storage from "@/features/media/data/media.storage";
 import { purgeSiteCDNCache } from "@/lib/invalidate";
@@ -145,6 +148,7 @@ export function resolveSiteConfig(
             blogConfig.theme.fuwari.primaryHue,
         },
       },
+      bannerFocus: config?.site?.bannerFocus ?? DEFAULT_BANNER_FOCUS,
     });
   } catch (error) {
     console.error("Failed to resolve site config:", error);
@@ -158,6 +162,7 @@ export function resolveSiteConfig(
       social: migrateSocial(blogConfig.social),
       icons: blogConfig.icons,
       theme: blogConfig.theme,
+      bannerFocus: DEFAULT_BANNER_FOCUS,
     });
   }
 }

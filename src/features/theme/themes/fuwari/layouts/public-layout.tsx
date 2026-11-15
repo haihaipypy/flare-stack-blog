@@ -1,5 +1,6 @@
 import { useLocation, useRouteContext } from "@tanstack/react-router";
 import { useState } from "react";
+import { bannerObjectPosition } from "@/features/config/site-config.schema";
 import type { PublicLayoutProps } from "@/features/theme/contract/layouts";
 import { BackToTop } from "../components/control/back-to-top";
 import { Sidebar } from "../components/sidebar";
@@ -25,6 +26,7 @@ export function PublicLayout({
   const isHomePage = location.pathname === "/";
   const isToolsPage = location.pathname === "/tools";
   const bannerHeightVh = isHomePage ? BANNER_HEIGHT_HOME : BANNER_HEIGHT_PAGE;
+  const bannerPosition = bannerObjectPosition(siteConfig.bannerFocus);
 
   return (
     <div
@@ -60,7 +62,8 @@ export function PublicLayout({
             src={siteConfig.theme.fuwari.homeBg}
             alt="banner"
             fetchPriority="high"
-            className="w-full h-full object-cover object-center"
+            className="w-full h-full object-cover"
+            style={{ objectPosition: bannerPosition }}
           />
         </div>
       ) : (
@@ -72,7 +75,8 @@ export function PublicLayout({
             src={siteConfig.theme.fuwari.homeBg}
             alt="banner"
             fetchPriority="high"
-            className="w-full h-full object-cover object-center"
+            className="w-full h-full object-cover"
+            style={{ objectPosition: bannerPosition }}
           />
         </div>
       )}

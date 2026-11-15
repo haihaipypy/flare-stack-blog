@@ -29,6 +29,34 @@ function createSiteTextFormSchema(max: number, messages: Messages) {
     .max(max, messages.settings_site_validation_too_long({ max }));
 }
 
+export const DEFAULT_BANNER_FOCUS = { x: 50, y: 50 };
+
+/**
+ * 封面图（首页横幅 / 主题背景）的视觉重心，用百分比表示。
+ * 浏览器对 object-position / background-position 的取值就是这两个百分比。
+ */
+function createBannerFocusSchema() {
+  return z.object({
+    x: z.number().min(0).max(100),
+    y: z.number().min(0).max(100),
+  });
+}
+
+function createBannerFocusFormSchema(messages: Messages) {
+  const range = messages.settings_site_validation_focus_range();
+  const invalid = messages.settings_site_validation_focus_invalid();
+  return z.object({
+    x: z.number({ message: invalid }).min(0, range).max(100, range),
+    y: z.number({ message: invalid }).min(0, range).max(100, range),
+  });
+}
+
+export function bannerObjectPosition(
+  focus: { x: number; y: number } | undefined,
+): string {
+  return `${focus?.x ?? DEFAULT_BANNER_FOCUS.x}% ${focus?.y ?? DEFAULT_BANNER_FOCUS.y}%`;
+}
+
 function createAssetRefSchema() {
   return z.string().refine((value) => value === "" || value.startsWith("/"), {
     message: "Please enter a root-relative path",
@@ -303,6 +331,7 @@ export const FullSiteConfigSchema = z.object({
     default: defaultThemeSiteConfigSchema,
     fuwari: fuwariThemeSiteConfigSchema,
   }),
+  bannerFocus: createBannerFocusSchema().default(DEFAULT_BANNER_FOCUS),
 });
 
 export function createSiteConfigInputFormSchema(messages: Messages) {
@@ -332,6 +361,7 @@ export function createSiteConfigInputFormSchema(messages: Messages) {
         fuwari: createFuwariThemeSiteConfigInputFormSchema(messages).optional(),
       })
       .optional(),
+    bannerFocus: createBannerFocusFormSchema(messages).optional(),
   });
 }
 
@@ -360,6 +390,7 @@ export const SiteConfigInputSchema = z.object({
       fuwari: fuwariThemeSiteConfigInputSchema.optional(),
     })
     .optional(),
+  bannerFocus: createBannerFocusSchema().optional(),
 });
 
 export const SiteConfigSchema = SiteConfigInputSchema;
