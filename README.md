@@ -52,7 +52,7 @@
 - **评论系统** — 嵌套回复、邮件通知、AI 辅助审核与上下文化评论审核
 - **友情链接** — 用户申请、管理员审核、邮件通知全流程
 - **通知系统** — 邮件与 Webhook 多通道，可按事件类型订阅
-- **数据统计** — 自建浏览量统计（访客匿名化），可选接入 Umami 与 Google Analytics
+- **数据统计** — 自建浏览量统计（访客匿名化），可选接入 Umami
 
 ### 站点与 SEO
 
@@ -290,7 +290,6 @@ bun run deploy                              # 构建并部署到 Workers
 | `BAIDU_PUSH_TOKEN`          | 运行时 | 百度搜索资源平台「普通收录」推送 token，不填则跳过推送                                                    |
 | `UMAMI_SRC`                 | 运行时 | Umami 客户端埋点代理 URL（如 `https://cloud.umami.is`）                                                   |
 | `VITE_UMAMI_WEBSITE_ID`     | 构建时 | Umami Website ID（客户端埋点）                                                                            |
-| `VITE_GOOGLE_ANALYTICS_ID`  | 构建时 | Google Analytics 衡量 ID（如 `G-XXXXXXXXXX`），不填则不注入 gtag                                          |
 | `TURNSTILE_SECRET_KEY`      | 运行时 | Cloudflare Turnstile 人机验证 Secret Key                                                                  |
 | `VITE_TURNSTILE_SITE_KEY`   | 构建时 | Cloudflare Turnstile Site Key                                                                             |
 | `GITHUB_TOKEN`              | 运行时 | GitHub API Token（版本更新检查，避免限流；不填也能检测）                                                  |

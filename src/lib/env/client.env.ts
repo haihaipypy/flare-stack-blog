@@ -3,7 +3,6 @@ import z from "zod";
 const clientEnvSchema = z.object({
   VITE_UMAMI_WEBSITE_ID: z.string().optional(),
   VITE_TURNSTILE_SITE_KEY: z.string().optional(),
-  VITE_GOOGLE_ANALYTICS_ID: z.string().optional(),
 });
 
 export function clientEnv() {

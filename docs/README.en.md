@@ -52,7 +52,7 @@ Deeply integrated with D1, R2, KV, Workflows, Queues and other Serverless servic
 - **Comment System** — Nested replies, email notifications, AI-assisted moderation, and richer moderation context.
 - **Friend Links** — A full flow covering user applications, admin moderation, and email notifications.
 - **Notification System** — Email and webhook channels with event-based subscriptions.
-- **Analytics** — Self-hosted pageview tracking (with anonymized visitors), plus optional Umami and Google Analytics.
+- **Analytics** — Self-hosted pageview tracking (with anonymized visitors), plus optional Umami.
 
 ### Site & SEO
 
@@ -290,7 +290,6 @@ For a more detailed walkthrough, see the [Deployment Guide](./deployment-guide.e
 | `BAIDU_PUSH_TOKEN`         | Runtime    | Token for Baidu's "普通收录" push API. Pushing is skipped when unset.                                      |
 | `UMAMI_SRC`                | Runtime    | Umami client-side tracking proxy URL (e.g., `https://cloud.umami.is`).                                    |
 | `VITE_UMAMI_WEBSITE_ID`    | Build-time | Umami Website ID (client-side tracking).                                                                  |
-| `VITE_GOOGLE_ANALYTICS_ID` | Build-time | Google Analytics measurement ID (e.g., `G-XXXXXXXXXX`). `gtag` is not injected when unset.                 |
 | `TURNSTILE_SECRET_KEY`     | Runtime    | Cloudflare Turnstile Secret Key for CAPTCHA.                                                              |
 | `VITE_TURNSTILE_SITE_KEY`  | Build-time | Cloudflare Turnstile Site Key.                                                                            |
 | `GITHUB_TOKEN`             | Runtime    | GitHub API Token (for update checking to avoid rate limits; optional).                                    |

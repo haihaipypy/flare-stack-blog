@@ -6,6 +6,12 @@
 
 ---
 
+## 2026-11（v1.6.1）
+
+### 移除
+
+- **移除 Google Analytics**：删掉根路由 `head` 里注入的 `googletagmanager.com/gtag/js` 脚本与内联 `gtag('config', …)`，`clientEnv` 不再读 `VITE_GOOGLE_ANALYTICS_ID`；`.env.example`、中英 README 环境变量表、部署工作流的变量注入一并清理。浏览量统计仍由自建 `pageview`（Queue + D1）承担，Umami 保持可选
+
 ## 2026-11（v1.6.0）
 
 ### 新增
@@ -136,4 +142,4 @@
 
 ## 关于版本号
 
-`package.json` 中的版本号沿用了上游的 `1.x` 序列（当前 `1.6.0`）。自 v1.6.0 起，每次提交都会同步升版本号并在此文件记一条：新增功能升 minor（`1.6.0 → 1.7.0`），修复与优化升 patch（`1.6.0 → 1.6.1`）。版本号由 `vite.config.ts` 注入 `__APP_VERSION__`，后台「版本检测」、MCP 服务端的 `version` 字段都读它。
+`package.json` 中的版本号沿用了上游的 `1.x` 序列（当前 `1.6.1`）。自 v1.6.0 起，每次提交都会同步升版本号并在此文件记一条：新增功能升 minor（`1.6.0 → 1.7.0`），修复与优化升 patch（`1.6.0 → 1.6.1`）。版本号由 `vite.config.ts` 注入 `__APP_VERSION__`，后台「版本检测」、MCP 服务端的 `version` 字段都读它。
